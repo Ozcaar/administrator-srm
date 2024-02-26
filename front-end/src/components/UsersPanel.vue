@@ -20,7 +20,7 @@ import Swal from 'sweetalert2'
                 <div class="table-container" @click="handleClick">
                     <table>
                         <thead>
-                            <tr>
+                            <tr class="table-header">
                                 <th>Usuario</th>
                                 <th>Nombre</th>
                                 <th>Contraseña</th>
@@ -83,7 +83,7 @@ export default {
     methods: {
         async fetchUsers() {
             try {
-                const response = await fetch('http://localhost:8080/users');
+                const response = await fetch('http://10.21.11.156:8080/users');
                 const data = await response.json();
                 this.users = data;
 
@@ -92,7 +92,7 @@ export default {
             }
 
             try {
-                const response = await fetch('http://localhost:8080/computers');
+                const response = await fetch('http://10.21.11.156:8080/computers');
                 const data = await response.json();
                 this.computers = data;
 
@@ -103,7 +103,7 @@ export default {
         async updateUser() {
             try {
                 console.log(this.modalData)
-                const usersResponse = await fetch('http://localhost:8080/users', {
+                const usersResponse = await fetch('http://10.21.11.156:8080/users', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -148,7 +148,7 @@ export default {
             return user != undefined ? user : null;
         },
         async updateComputer() {
-            const computersResponse = await fetch('http://localhost:8080/computers', {
+            const computersResponse = await fetch('http://10.21.11.156:8080/computers', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -193,8 +193,8 @@ export default {
                 },
                 html: `
                             <form class="form-container">
-                                <label>ID</label>
-                                <input disabled value ="${this.modalData.id}" id="swal-input0" class="input input-text input-id" placeholder="[no modificable]" autocomplete="off">
+                                <label style="display: none;">ID</label>
+                                <input style="display: none;" disabled value ="${this.modalData.id}" id="swal-input0" class="input input-text input-id" placeholder="[no modificable]" autocomplete="off">
 
                                 <label>Usuario</label>
                                 <input value ="${this.modalData.user.trim()}" id="swal-input1" class="input input-text" placeholder="Usuario / usrm" autocomplete="off">
@@ -247,7 +247,7 @@ export default {
                                     margin: 5px 0 25px 0;
                                     font-size: 15px;
                                     font-family: sans-serif;
-                                    width: 100%;
+                                    width: 90%;
                                 }
 
                                 .input-id {
@@ -272,7 +272,7 @@ export default {
                                 }
 
                                 .input-textarea {
-                                    width: 100%;
+                                    width: 90%;
                                     height: 50px;
                                     padding: 10px;
                                     font-size: 16px;
@@ -286,6 +286,11 @@ export default {
 
                                 .input-textarea:focus {
                                     border-color: #bdbdbd;
+                                }
+
+                                @media screen and (max-width: 768px) {
+                                .form-container {
+                                    width: 100%;
                                 }
                             </style>
                          `,
@@ -481,6 +486,10 @@ export default {
 
 .btn {}
 
+.table-header th {
+    font-weight: bold;
+}
+
 .table-container {
     overflow: scroll;
     flex-grow: 1;
@@ -514,12 +523,41 @@ tbody>tr:hover {
 
 
 @media screen and (max-width: 768px) {
-  .sidebar-container {
-    display: none;
-  }
-  .content-inputs {
-    display: block;
+
+    .input-find {
+        width: 100%;
+    }
+
+    .btn {
+        border-radius: 10px;
+        /* border: var(--light-gray) 1px solid; */
+        padding: 10px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        /* color: var(--gray); */
+        color: #6b7280;
+        border: #e4e4e7 1px solid;
+        height: 50px;
+        margin-right: 5px;
+
+        min-width: 50px;
+    }
+
+    .content {
+        padding: 15px;
+        /* height: calc(100% - 60px);
+        display: flex;
+        flex-direction: column; */
+    }
+
+    .table-container {
+        border: 1px solid #ddd;
+    }
+
+    .content-inputs {
+        display: block;
+    }
 }
-}
+
 /* END RESPONSIVE */
 </style>
