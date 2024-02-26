@@ -48,7 +48,8 @@ import { RouterLink } from 'vue-router'
 }
 
 .sidebar-container {
-    min-width: 350px;
+    width: 100%;
+    max-width: 350px;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -105,4 +106,12 @@ import { RouterLink } from 'vue-router'
     cursor: pointer;
     color: var(--dark);
 }
+
+/* RESPONSIVE */
+@media screen and (max-width: 768px) {
+  .sidebar-container {
+    display: none;
+  }
+}
+/* END RESPONSIVE */
 </style>
