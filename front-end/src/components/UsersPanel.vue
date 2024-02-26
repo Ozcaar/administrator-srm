@@ -13,7 +13,7 @@ import Swal from 'sweetalert2'
                     <input class="input-find" type="text" placeholder="🔍 Búsqueda por usuario" />
 
                     <button class="btn" @click="openModal(newData())">🧑‍💼 Agregar usuario</button>
-                    <button class="btn">👁️ Mostrar contraseña</button>
+                    <button class="btn btn-toggle" @click="togglePassword()">🙂 Mostrar contraseña</button>
                     <button class="btn"><strong>❔</strong></button>
                 </div>
 
@@ -34,7 +34,7 @@ import Swal from 'sweetalert2'
                                 @click="openModal(user)">
                                 <td>{{ user.user }}</td>
                                 <td>{{ user.name }}</td>
-                                <td>{{ user.password }}</td>
+                                <td class="password password-hidden">{{ user.password }}</td>
                                 <td>{{ user.active }}</td>
                                 <td>{{ findComputer(user.id_computer)["name"] }}</td>
                                 <td>{{ user.comment }}</td>
@@ -55,6 +55,8 @@ export default {
             tempUser: {},
             users: [],
             computers: [],
+            passwordHidden: true,
+            originalPasswords: {},
             modalData: {
                 id: '',
                 user: '',
@@ -178,10 +180,21 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: 'Modificar',
                 cancelButtonText: 'Cancelar',
+                didRender: () => {
+                    const checkbox = document.getElementById('show-hide-checkbox');
+                    if (checkbox) {
+                        checkbox.addEventListener('click', () => {
+                            const passwordInput = document.getElementById('swal-input3');
+                            if (passwordInput) {
+                                passwordInput.type = checkbox.checked ? 'text' : 'password';
+                            }
+                        });
+                    }
+                },
                 html: `
                             <form class="form-container">
                                 <label>ID</label>
-                                <input disabled value ="${this.modalData.id}" id="swal-input0" class="input input-text input-id" placeholder="[Dato interno no modificable]" autocomplete="off">
+                                <input disabled value ="${this.modalData.id}" id="swal-input0" class="input input-text input-id" placeholder="[no modificable]" autocomplete="off">
 
                                 <label>Usuario</label>
                                 <input value ="${this.modalData.user.trim()}" id="swal-input1" class="input input-text" placeholder="Usuario / usrm" autocomplete="off">
@@ -193,7 +206,7 @@ export default {
                                     <label>Contraseña</label>
                                     <div class="password-field">
                                         <input value ="${this.modalData.password.trim()}" type="${this.modalData.password.trim() === 'N/A' || this.modalData.password.trim() === 'S/D' ? 'text' : 'password'}" id="swal-input3" class="input input-text" placeholder="Contraseña" autocomplete="off">
-                                        <input ${this.modalData.password.trim() === 'N/A' || this.modalData.password.trim() === 'S/D' ? 'checked' : ''} type="checkbox" class="show-hide-checkbox">
+                                        <input ${this.modalData.password.trim() === 'N/A' || this.modalData.password.trim() === 'S/D' ? 'checked' : ''} type="checkbox" id="show-hide-checkbox">
                                         <span>Mostrar contraseña</span>
                                     </div>
                                 </div>
@@ -245,6 +258,7 @@ export default {
                                 }
                                 
                                 .password-field {
+                                    margin-bottom: 20px
                                 }
                                 
                                 .show-hide-checkbox {
@@ -387,6 +401,20 @@ export default {
                 id_computer: '',
                 comment: ''
             };
+        },
+        togglePassword() {
+            const toggleButton = document.querySelector('.btn-toggle');
+
+            document.querySelectorAll('.password').forEach(cell => {
+                if (this.passwordHidden) {
+                    cell.classList.remove('password-hidden');
+                    toggleButton.textContent = '😌 Ocultar contraseñas';
+                } else {
+                    cell.classList.add('password-hidden');
+                    toggleButton.textContent = '🙂 Mostrar contraseñas';
+                }
+            });
+            this.passwordHidden = !this.passwordHidden;
         }
     }
 }
@@ -412,6 +440,11 @@ export default {
     border-bottom: 1px solid #e4e4e7;
 
 }
+
+.password-hidden {
+    -webkit-text-security: disc !important;
+}
+
 
 .content {
     padding: 30px;
@@ -476,4 +509,17 @@ tbody>tr:hover {
     cursor: pointer;
     background-color: var(--btn-selected);
 }
+
+/* RESPONSIVE */
+
+
+@media screen and (max-width: 768px) {
+  .sidebar-container {
+    display: none;
+  }
+  .content-inputs {
+    display: block;
+}
+}
+/* END RESPONSIVE */
 </style>
