@@ -50,8 +50,8 @@ import { RouterLink } from 'vue-router'
             </div> -->
 
             <nav class="nav-mobile">
-                <RouterLink class="btn" to="/panel/users">Usuarios</RouterLink>
-                <RouterLink class="btn" to="/panel/computers">Computadoras</RouterLink>
+                <RouterLink class="btn" to="/panel/users" @click="toggleCheckBox()">Usuarios</RouterLink>
+                <RouterLink class="btn" to="/panel/computers" @click="toggleCheckBox()">Computadoras</RouterLink>
                 <!-- <RouterLink class="btn" to="/panel/correos">Correos</RouterLink> -->
                 <!-- <RouterLink class="btn" to="/antivirus">Antivirus</RouterLink> -->
                 <!-- <RouterLink class="btn" to="/office">Office</RouterLink> -->
@@ -63,6 +63,22 @@ import { RouterLink } from 'vue-router'
 
     </div>
 </template>
+
+<script>
+export default {
+    data() {
+        return {
+        }
+    },
+    mounted() {
+    },
+    methods: {
+        async toggleCheckBox() {
+            document.getElementById("input-menu").checked = false;
+        }
+    }
+}
+</script>
 
 <style>
 .general-container {
