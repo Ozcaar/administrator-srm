@@ -37,6 +37,30 @@ import { RouterLink } from 'vue-router'
         </aside>
 
         <slot></slot>
+
+        <input name="input-menu" id="input-menu" class="input-menu" type="checkbox">
+        <label class="btn-menu" for="input-menu">
+            <span class="menu-span-1"></span>
+            <span class="menu-span-2"></span>
+            <span class="menu-span-3"></span>
+        </label>
+        <aside class="sidebar-container-mobile">
+            <!-- <div class="title-container">
+                <h2 class="header">Admin Panel</h2>
+            </div> -->
+
+            <nav class="nav-mobile">
+                <RouterLink class="btn" to="/panel/users">Usuarios</RouterLink>
+                <RouterLink class="btn" to="/panel/computers">Computadoras</RouterLink>
+                <!-- <RouterLink class="btn" to="/panel/correos">Correos</RouterLink> -->
+                <!-- <RouterLink class="btn" to="/antivirus">Antivirus</RouterLink> -->
+                <!-- <RouterLink class="btn" to="/office">Office</RouterLink> -->
+                <!-- <RouterLink class="btn" to="/dameware">Dameware</RouterLink> -->
+                <!-- <RouterLink class="btn" to="/extensiones">Extensiones</RouterLink> -->
+            </nav>
+        </aside>
+
+
     </div>
 </template>
 
@@ -45,6 +69,7 @@ import { RouterLink } from 'vue-router'
     display: flex;
     width: 100%;
     height: 100vh;
+    position: relative;
 }
 
 .sidebar-container {
@@ -107,11 +132,157 @@ import { RouterLink } from 'vue-router'
     color: var(--dark);
 }
 
-/* RESPONSIVE */
-@media screen and (max-width: 768px) {
-  .sidebar-container {
+.input-menu,
+.btn-menu,
+.sidebar-container-mobile {
     display: none;
-  }
 }
+
+/* RESPONSIVE */
+
+@media screen and (max-width: 768px) {
+
+    .general-container {
+        position: relative;
+    }
+
+    .sidebar-container {
+        display: none;
+    }
+
+    .sidebar-container-mobile {
+        position: absolute;
+        background-color: #fafafa;
+        height: 100%;
+        right: 0;
+        top: 0;
+        overflow: hidden;
+        /* filter: drop-shadow(-5px 0px 5px #ddd); */
+        /* border: 1px solid #ddd; */
+    }
+
+    .nav-mobile {
+        margin-top: 60px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .nav-mobile * {
+        display: flex;
+        flex-direction: column;
+        padding: 0 40px;
+
+        text-decoration: none;
+        color: black;
+        font-family: sans-serif;
+        /* border: 1px solid black; */
+        height: 45px;
+
+        justify-content: center;
+
+        background-color: #ececec;
+        margin: 5px 0;
+        width: 90%;
+        border-radius: 5px;
+    }
+
+    /* HAMBURGUER MENU */
+    /* Estilos para el menú */
+    .sidebar-container-mobile {
+        width: 0;
+        display: initial;
+        transition: 500ms all;
+    }
+
+    .menu {
+        position: relative;
+    }
+
+    .input-menu:checked~.sidebar-container-mobile {
+        height: 100%;
+        width: 70%;
+    }
+
+    /* Estilos para el input del menú */
+    .input-menu {
+        appearance: none;
+        padding: 0;
+        margin: 0;
+        outline: none;
+        pointer-events: none;
+        display: none;
+    }
+
+    /* Estilos para el botón del menú */
+    .input-menu:checked~.btn-menu span:nth-child(1) {
+        rotate: 45deg;
+        transform: translate(4px, 3px);
+    }
+
+    .input-menu:checked~.btn-menu span:nth-child(2) {
+        rotate: -45deg;
+        transform: translate(4px, -3px);
+        width: 24px;
+    }
+
+    .input-menu:checked~.btn-menu span:nth-child(3) {
+        opacity: 0;
+    }
+
+    .btn-menu {
+        display: flex;
+        align-items: flex-end;
+        flex-direction: column;
+        position: absolute;
+        gap: 8px;
+        z-index: 2;
+        cursor: pointer;
+        margin-top: 20px;
+        right: 20px;
+        z-index: 3;
+
+        transition: 500ms all;
+    }
+
+    .input-menu:checked~.btn-menu {
+        transform: scale(120%) translate(0, 4px);
+    }
+
+    .btn-menu span {
+        background-color: black;
+        height: 2px;
+        width: 24px;
+        transition: 500ms all;
+        transform-origin: center;
+    }
+
+    .btn-menu span:nth-child(2) {
+        height: 2px;
+        width: 18px;
+    }
+
+    /* Animación de apertura de la barra lateral */
+    @keyframes openSidebar {
+        0% {
+            width: 0;
+        }
+
+        20% {
+            width: 0;
+        }
+
+        80% {
+            width: 360px;
+        }
+
+        100% {
+            width: 360px;
+        }
+    }
+
+    /* END HAMBURGUER MENU */
+}
+
 /* END RESPONSIVE */
 </style>
