@@ -13,7 +13,8 @@ import Swal from 'sweetalert2'
             </div>
             <div class="content">
                 <div class="content-inputs">
-                    <input class="input-find" type="text" placeholder="🔍 Búsqueda por usuario" />
+                    <input id="input-search" class="input-search" type="text" placeholder="🔍 Búsqueda por nombre"
+                        @input="searchByInput()" />
 
                     <button class="btn" @click="openModal(newData())">🧑‍💼 Agregar usuario</button>
                     <button class="btn btn-toggle" @click="togglePassword()">🙂 Mostrar contraseña</button>
@@ -21,15 +22,15 @@ import Swal from 'sweetalert2'
                 </div>
 
                 <div class="table-container" @click="handleClick">
-                    <table>
+                    <table id="table">
                         <thead>
                             <tr class="table-header">
-                                <th>Usuario</th>
-                                <th>Nombre</th>
-                                <th>Contraseña</th>
-                                <th>Activo</th>
-                                <th>PC</th>
-                                <th>Comentarios</th>
+                                <th @click="ordenarTabla(0)">Usuario</th>
+                                <th @click="ordenarTabla(1)">Nombre</th>
+                                <th @click="ordenarTabla(2)">Contraseña</th>
+                                <th @click="ordenarTabla(3)">Activo</th>
+                                <th @click="ordenarTabla(4)">PC</th>
+                                <th @click="ordenarTabla(5)">Comentarios</th>
                             </tr>
                         </thead>
                         <tbody class="table-body">
@@ -55,12 +56,13 @@ import Swal from 'sweetalert2'
 export default {
     data() {
         return {
-            // url: 'http://10.21.11.156:8080',
+            url: 'http://10.21.11.156:8080',
             // url: 'http://localhost:8080',
-            url: 'http://192.168.1.15:8080',
+            // url: 'http://192.168.1.15:8080',
             tempIdComputer: 0,
             tempUser: {},
             users: [],
+            auxUsers: [],
             computers: [],
             passwordHidden: true,
             originalPasswords: {},
@@ -90,24 +92,25 @@ export default {
     methods: {
         async fetchUsers() {
             try {
-                const response = await fetch(this.url + '/users')
-                const data = await response.json()
-                this.users = data
+                const response = await fetch(this.url + '/users');
+                const data = await response.json();
+                this.users = data;
+                this.auxUsers = data;
+                document.getElementById("input-search").value = '';
             } catch (error) {
                 console.error('Error al obtener usuarios:', error)
             }
 
             try {
-                const response = await fetch(this.url + '/computers')
-                const data = await response.json()
-                this.computers = data
+                const response = await fetch(this.url + '/computers');
+                const data = await response.json();
+                this.computers = data;
             } catch (error) {
-                console.error('Error al obtener computadoras:', error)
+                console.error('Error al obtener computadoras:', error);
             }
         },
         async updateUser() {
             try {
-                console.log(this.modalData)
                 const usersResponse = await fetch(this.url + '/users', {
                     method: 'POST',
                     headers: {
@@ -115,42 +118,41 @@ export default {
                         // KEYS DEL CORS
                     },
                     body: JSON.stringify(this.modalData)
-                })
+                });
 
                 if (!usersResponse.ok) {
-                    console.log(this.modalData)
-                    throw new Error('Network users response was not ok')
+                    throw new Error('Network users response was not ok');
                 }
 
                 await this.fetchUsers()
                 Swal.fire({
                     title: 'Hecho!',
                     icon: 'success'
-                })
+                });
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error)
                 Swal.fire({
                     title: 'Error!',
                     text: '(2) Hay un error en la captura de los datos: ' + error,
                     icon: 'warning'
-                })
+                });
             }
         },
         findUser(user_name) {
-            const user_name_list = this.users.filter((u) => u.user === user_name)
-            return user_name_list
+            const user_name_list = this.users.filter((u) => u.user === user_name);
+            return user_name_list;
         },
         findComputer(id) {
-            const computer = this.computers.find((c) => c.id === id)
-            return computer != null ? computer : ''
+            const computer = this.computers.find((c) => c.id === id);
+            return computer != null ? computer : '';
         },
         findComputerByName(name) {
-            const computer = this.computers.find((c) => c.name === name)
-            return computer != null ? computer : null
+            const computer = this.computers.find((c) => c.name === name);
+            return computer != null ? computer : null;
         },
         findUserComputerId(id_computer) {
-            const user = this.users.find((u) => u.id_computer === id_computer)
-            return user != undefined ? user : null
+            const user = this.users.find((u) => u.id_computer === id_computer);
+            return user != undefined ? user : null;
         },
         async updateComputer() {
             const computersResponse = await fetch(this.url + '/computers', {
@@ -160,13 +162,13 @@ export default {
                     // KEYS DEL CORS
                 },
                 body: JSON.stringify(this.computerData)
-            })
+            });
 
             if (!computersResponse.ok) {
-                throw new Error('Network computers response was not ok')
+                throw new Error('Network computers response was not ok');
             }
-            const jsonResponse = await computersResponse.json()
-            return jsonResponse
+            const jsonResponse = await computersResponse.json();
+            return jsonResponse;
         },
         openModal(user) {
             this.modalData = {
@@ -186,14 +188,14 @@ export default {
                 confirmButtonText: 'Modificar',
                 cancelButtonText: 'Cancelar',
                 didRender: () => {
-                    const checkbox = document.getElementById('show-hide-checkbox')
+                    const checkbox = document.getElementById('show-hide-checkbox');
                     if (checkbox) {
                         checkbox.addEventListener('click', () => {
-                            const passwordInput = document.getElementById('swal-input3')
+                            const passwordInput = document.getElementById('swal-input3');
                             if (passwordInput) {
-                                passwordInput.type = checkbox.checked ? 'text' : 'password'
+                                passwordInput.type = checkbox.checked ? 'text' : 'password';
                             }
-                        })
+                        });
                     }
                 },
                 html: `
@@ -304,7 +306,7 @@ export default {
                         document.getElementById('swal-input5').value.trim() != '' &&
                         document.getElementById('swal-input5').value.trim() != null
                     ) {
-                        let computer = this.findComputerByName(document.getElementById('swal-input5').value)
+                        let computer = this.findComputerByName(document.getElementById('swal-input5').value);
 
                         if (computer == null) {
                             this.computerData = {
@@ -317,15 +319,13 @@ export default {
                                 comment: ''
                             }
 
-                            computer = await this.updateComputer()
-                        }
-                        this.computerData = computer
+                            computer = await this.updateComputer();
+                        };
+                        this.computerData = computer;
                     }
 
-                    console.log(this.modalData)
-
-                    this.tempIdComputer = this.modalData.id_computer
-                    this.tempUser = this.modalData.user
+                    this.tempIdComputer = this.modalData.id_computer;
+                    this.tempUser = this.modalData.user;
 
                     this.modalData = {
                         id: document.getElementById('swal-input0').value, // id
@@ -342,18 +342,17 @@ export default {
                         id_computer: this.computerData['id'], // id_computer
                         comment: document.getElementById('swal-input6').value // comment
                     }
-                    console.log(this.modalData)
                 }
             }).then((result) => {
-                const sameUser = this.tempUser === this.modalData.user
-                const userExists = this.findUser(this.modalData.user).length > 0 ? true : false
-                const computerIdNotFound = this.findUserComputerId(this.computerData.id) === null
+                const sameUser = this.tempUser === this.modalData.user;
+                const userExists = this.findUser(this.modalData.user).length > 0 ? true : false;
+                const computerIdNotFound = this.findUserComputerId(this.computerData.id) === null;
                 const sameIdOrNoComputerId =
-                    this.tempIdComputer === this.modalData.id_computer || this.modalData.id_computer === null
+                    this.tempIdComputer === this.modalData.id_computer || this.modalData.id_computer === null;
                 const fieldsRequired =
                     this.modalData.user === null ||
                     this.modalData.name === null ||
-                    this.modalData.password === null
+                    this.modalData.password === null;
 
                 if (result.isConfirmed) {
                     try {
@@ -363,38 +362,33 @@ export default {
                                 text: 'Los campos "Usuario", "Nombre" y "Contraseña" son requeridos',
                                 icon: 'warning'
                             })
-                            return
+                            return;
                         }
 
                         if (computerIdNotFound || sameIdOrNoComputerId) {
-                            console.log(sameUser)
-                            console.log(userExists)
-                            console.log(!sameUser && userExists)
-                            console.log(!sameUser && userExists && this.tempUser === '')
                             if (!sameUser && userExists && this.tempUser === '') {
                                 Swal.fire({
                                     title: 'Error!',
                                     text: 'Ya existe otro registro con ese usuario',
                                     icon: 'warning'
                                 })
-                                return
+                                return;
                             }
                             this.updateUser()
                         } else {
-                            console.log(this.modalData)
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error!',
                                 text: 'Ya existe otro usuario registrado con esa PC'
                             })
-                            return
+                            return;
                         }
                     } catch (error) {
                         Swal.fire({
                             title: 'Error!',
                             text: '(1) Hay un error en la captura de los datos: ' + error,
                             icon: 'warning'
-                        })
+                        });
                     }
                 }
             })
@@ -425,14 +419,60 @@ export default {
 
             document.querySelectorAll('.password').forEach((cell) => {
                 if (this.passwordHidden) {
-                    cell.classList.remove('password-hidden')
-                    toggleButton.textContent = '😌 Ocultar contraseñas'
+                    cell.classList.remove('password-hidden');
+                    toggleButton.textContent = '😌 Ocultar contraseñas';
                 } else {
-                    cell.classList.add('password-hidden')
-                    toggleButton.textContent = '🙂 Mostrar contraseñas'
+                    cell.classList.add('password-hidden');
+                    toggleButton.textContent = '🙂 Mostrar contraseñas';
                 }
             })
             this.passwordHidden = !this.passwordHidden
+        },
+        searchByInput() {
+            const inputSearch = document.getElementById("input-search").value;
+
+            if (inputSearch !== '') {
+                this.users = this.auxUsers.filter(u => u.name.includes(inputSearch))
+            } else {
+                this.users = this.auxUsers;
+            }
+        },
+        ordenarTabla(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("table");
+            switching = true;
+            // Establece la dirección de orden inicial a ascendente
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("td")[n];
+                    y = rows[i + 1].getElementsByTagName("td")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
         }
     }
 }
@@ -474,7 +514,7 @@ export default {
     display: flex;
 }
 
-.input-find,
+.input-search,
 .btn {
     border-radius: 10px;
     /* border: var(--light-gray) 1px solid; */
@@ -534,7 +574,7 @@ tbody>tr:hover {
 /* RESPONSIVE */
 
 @media screen and (max-width: 768px) {
-    .input-find {
+    .input-search {
         width: 100%;
     }
 
