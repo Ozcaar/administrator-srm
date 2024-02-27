@@ -10,29 +10,10 @@ import Swal from 'sweetalert2'
         <div class="container">
             <div class="header">
                 <h2>Usuarios</h2>
-                <div class="movile-nav">
-                    <a href="#" id="menu_on">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </a>
-                    <!-- <nav class="menu">
-                        <ul>
-                        <li>
-                                <RouterLink class="btn" to="/panel/users">Usuarios</RouterLink>
-                            </li>
-                            <li>
-                                <RouterLink class="btn" to="/panel/computers">Computadoras</RouterLink>
-                            </li>
-                            <li><a href="#">Servicios</a></li>
-                            <li><a href="#">Contacto</a></li>
-                        </ul>
-                    </nav> -->
-                </div>
             </div>
             <div class="content">
                 <div class="content-inputs">
-                    <input class="input-find" type="text" placeholder="🔍 Búsqueda por usuario (aún no funciona)" />
+                    <input class="input-find" type="text" placeholder="🔍 Búsqueda por usuario" />
 
                     <button class="btn" @click="openModal(newData())">🧑‍💼 Agregar usuario</button>
                     <button class="btn btn-toggle" @click="togglePassword()">🙂 Mostrar contraseña</button>
@@ -74,6 +55,9 @@ import Swal from 'sweetalert2'
 export default {
     data() {
         return {
+            // url: 'http://10.21.11.156:8080',
+            // url: 'http://localhost:8080',
+            url: 'http://192.168.1.15:8080',
             tempIdComputer: 0,
             tempUser: {},
             users: [],
@@ -106,7 +90,7 @@ export default {
     methods: {
         async fetchUsers() {
             try {
-                const response = await fetch('http://10.21.11.156:8080/users')
+                const response = await fetch(this.url + '/users')
                 const data = await response.json()
                 this.users = data
             } catch (error) {
@@ -114,7 +98,7 @@ export default {
             }
 
             try {
-                const response = await fetch('http://10.21.11.156:8080/computers')
+                const response = await fetch(this.url + '/computers')
                 const data = await response.json()
                 this.computers = data
             } catch (error) {
@@ -124,7 +108,7 @@ export default {
         async updateUser() {
             try {
                 console.log(this.modalData)
-                const usersResponse = await fetch('http://10.21.11.156:8080/users', {
+                const usersResponse = await fetch(this.url + '/users', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -169,7 +153,7 @@ export default {
             return user != undefined ? user : null
         },
         async updateComputer() {
-            const computersResponse = await fetch('http://10.21.11.156:8080/computers', {
+            const computersResponse = await fetch(this.url + '/computers', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -455,89 +439,6 @@ export default {
 </script>
 
 <style scoped>
-/* HAMBURGUER MENU */
-.menu-icon {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 40px;
-    height: 4px;
-    background-color: #333;
-    cursor: pointer;
-    z-index: 9999;
-    transition: transform 0.5s;
-}
-
-.menu-icon::before,
-.menu-icon::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 4px;
-    background-color: #333;
-    transition: transform 0.5s;
-}
-
-.menu-icon::before {
-    top: -12px;
-}
-
-.menu-icon::after {
-    top: 12px;
-}
-
-#menu-toggle {
-    display: none;
-}
-
-.menu {
-    position: fixed;
-    top: 0;
-    /* left: 0; */
-    width: 100%;
-    height: 100%;
-    background-color: #fff;
-    z-index: 9998;
-    transform: translateY(-100%);
-    transition: transform 0.5s;
-}
-
-/* .menu ul {
-    list-style: none;
-    padding: 0;
-    margin: 50% 0 0 0;
-    text-align: center;
-}
-
-.menu ul li {
-    margin: 20px 0;
-}
-
-.menu ul li a {
-    text-decoration: none;
-    color: #333;
-    font-size: 20px;
-} */
-
-/* 
-#menu-toggle:checked+.menu {
-    transform: translateY(0);
-}
-
-#menu-toggle:checked+.menu-icon {
-    transform: rotate(90deg);
-}
-
-#menu-toggle:checked+.menu-icon::before {
-    transform: translateY(12px) rotate(45deg);
-}
-
-#menu-toggle:checked+.menu-icon::after {
-    transform: translateY(-12px) rotate(-45deg);
-} */
-
-/* END HAMBURGUER MENU */
-
 .container {
     width: 100%;
     overflow: hidden;
