@@ -188,6 +188,7 @@ export default {
                 confirmButtonText: 'Modificar',
                 cancelButtonText: 'Cancelar',
                 didRender: () => {
+                    // TOGGLE HIDE PASSWORD IN THE MODAL
                     const checkbox = document.getElementById('show-hide-checkbox');
                     if (checkbox) {
                         checkbox.addEventListener('click', () => {
@@ -306,8 +307,8 @@ export default {
                         document.getElementById('swal-input5').value.trim() != '' &&
                         document.getElementById('swal-input5').value.trim() != null
                     ) {
+                        // VERIFICAR SI LA PC DADA YA EXISTE
                         let computer = this.findComputerByName(document.getElementById('swal-input5').value);
-
                         if (computer == null) {
                             this.computerData = {
                                 id: null,
@@ -327,6 +328,7 @@ export default {
                     this.tempIdComputer = this.modalData.id_computer;
                     this.tempUser = this.modalData.user;
 
+                    // OBTENER LOS DATOS DE LOS INPUTS DEL MODAL Y GUARDARLOS
                     this.modalData = {
                         id: document.getElementById('swal-input0').value, // id
                         user:
@@ -344,6 +346,7 @@ export default {
                     }
                 }
             }).then((result) => {
+                // CONSTANTES NECESARIAS PARA LA VALIDACIÓN
                 const sameUser = this.tempUser === this.modalData.user;
                 const userExists = this.findUser(this.modalData.user).length > 0 ? true : false;
                 const computerIdNotFound = this.findUserComputerId(this.computerData.id) === null;
@@ -354,6 +357,7 @@ export default {
                     this.modalData.name === null ||
                     this.modalData.password === null;
 
+                //VALIDACIÓN DE DATOS INGRESADOS
                 if (result.isConfirmed) {
                     try {
                         if (fieldsRequired) {
@@ -441,6 +445,7 @@ export default {
             var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
             table = document.getElementById("table");
             switching = true;
+
             // Establece la dirección de orden inicial a ascendente
             dir = "asc";
             while (switching) {
@@ -479,6 +484,7 @@ export default {
 </script>
 
 <style scoped>
+/* Estilos generales */
 .container {
     width: 100%;
     overflow: hidden;
@@ -489,20 +495,19 @@ export default {
     width: 100%;
     display: flex;
     align-items: center;
-    /* justify-content: space-between; */
     background-color: #f5f5f5;
     font-family: system-ui, sans-serif;
-    font-weight: bold;
+    font-weight: bolder;
     padding: 0 0 0 20px;
-    /* border-bottom: var(--light-gray) solid 1px; */
-
     border-bottom: 1px solid #e4e4e7;
+    /* Se reemplazó por la propiedad border-bottom */
 }
 
 .password-hidden {
     -webkit-text-security: disc !important;
 }
 
+/* Estilos de contenido */
 .content {
     padding: 30px;
     height: calc(100% - 60px);
@@ -517,19 +522,17 @@ export default {
 .input-search,
 .btn {
     border-radius: 10px;
-    /* border: var(--light-gray) 1px solid; */
     padding: 10px;
     margin-bottom: 20px;
     font-size: 15px;
-    /* color: var(--gray); */
     color: #6b7280;
     border: #e4e4e7 1px solid;
     height: 50px;
     margin-right: 5px;
-
     min-width: 50px;
 }
 
+/* Estilos de botones */
 .btn:hover {
     cursor: pointer;
     color: var(--dark);
@@ -538,6 +541,7 @@ export default {
 
 .btn {}
 
+/* Estilos de tablas */
 .table-header th {
     font-weight: bold;
 }
@@ -571,8 +575,7 @@ tbody>tr:hover {
     background-color: var(--btn-selected);
 }
 
-/* RESPONSIVE */
-
+/* Estilos responsivos */
 @media screen and (max-width: 768px) {
     .input-search {
         width: 100%;
@@ -580,24 +583,18 @@ tbody>tr:hover {
 
     .btn {
         border-radius: 10px;
-        /* border: var(--light-gray) 1px solid; */
         padding: 10px;
         margin-bottom: 20px;
         font-size: 13px;
-        /* color: var(--gray); */
         color: #6b7280;
         border: #e4e4e7 1px solid;
         height: 50px;
         margin-right: 5px;
-
         min-width: 50px;
     }
 
     .content {
         padding: 15px;
-        /* height: calc(100% - 60px);
-        display: flex;
-        flex-direction: column; */
     }
 
     .table-container {
@@ -608,6 +605,5 @@ tbody>tr:hover {
         display: block;
     }
 }
-
-/* END RESPONSIVE */
 </style>
+
