@@ -16,7 +16,6 @@ import Swal from 'sweetalert2'
                         @input="searchByInput()" />
 
                     <button class="btn" @click="openModal(newData())">🖥️ Agregar computadora</button>
-                    <!-- <button class="btn btn-toggle" @click="togglePassword()">🙂 Mostrar contraseña</button> -->
                     <button class="btn"><strong>❔</strong></button>
                 </div>
 
@@ -73,15 +72,6 @@ export default {
                 adquisition_date: '',
                 comment: ''
             },
-            // computerData: {
-            //     id: '',
-            //     name: '',
-            //     active: false,
-            //     service_tag: '',
-            //     ip: '',
-            //     adquisition_date: '',
-            //     comment: ''
-            // }
         }
     },
     mounted() {
@@ -98,14 +88,6 @@ export default {
             } catch (error) {
                 console.error('Error al obtener usuarios:', error)
             }
-
-            // try {
-            //     const response = await fetch(this.url + '/computers');
-            //     const data = await response.json();
-            //     this.computers = data;
-            // } catch (error) {
-            //     console.error('Error al obtener computadoras:', error);
-            // }
         },
         async updateComputer() {
             try {
@@ -141,10 +123,6 @@ export default {
             const computer_name_list = this.computers.filter((c) => c.name === computer_name);
             return computer_name_list;
         },
-        // findComputer(id) {
-        //     const computer = this.computers.find((c) => c.id === id);
-        //     return computer != null ? computer : '';
-        // },
         findComputerByName(name) {
             const computer = this.computers.find((c) => c.name === name);
             return computer != null ? computer : null;
@@ -153,22 +131,6 @@ export default {
             const user = this.users.find((u) => u.id_computer === id_computer);
             return user != undefined ? user : null;
         },
-        // async updateComputer() {
-        //     const computersResponse = await fetch(this.url + '/computers', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //             // KEYS DEL CORS
-        //         },
-        //         body: JSON.stringify(this.computerData)
-        //     });
-
-        //     if (!computersResponse.ok) {
-        //         throw new Error('Network computers response was not ok');
-        //     }
-        //     const jsonResponse = await computersResponse.json();
-        //     return jsonResponse;
-        // },
         openModal(computer) {
             this.modalData = {
                 id: computer.id,
@@ -286,29 +248,10 @@ export default {
                     if (
                         document.getElementById('swal-input5').value.trim() != '' &&
                         document.getElementById('swal-input5').value.trim() != null
-                    ) {
-                        // VERIFICAR SI LA PC DADA YA EXISTE
-                        // let computer = this.findComputerByName(document.getElementById('swal-input5').value);
-                        // if (computer == null) {
-                        //     this.computerData = {
-                        //         id: null,
-                        //         name: document.getElementById('swal-input5').value,
-                        //         active: true,
-                        //         service_tag: null,
-                        //         ip: null,
-                        //         adquisition_date: '',
-                        //         comment: ''
-                        //     }
+                    )
+                        this.tempComputer = this.modalData.name;
 
-                        //     computer = await this.updateComputer();
-                        // };
-                        // this.computerData = computer;
-                    }
-
-                    // this.tempIdComputer = this.modalData.id_computer;
-                    this.tempComputer = this.modalData.name;
-
-                    // OBTENER LOS DATOS DE LOS INPUTS DEL MODAL Y GUARDARLOS
+                    // GET INPUT VALUES FROM MODAL AND SAVE IT
                     this.modalData = {
                         id: document.getElementById('swal-input0').value, // id
                         name:
@@ -316,9 +259,9 @@ export default {
                                 ? null
                                 : document.getElementById('swal-input1').value === '' ? null : document.getElementById('swal-input1').value.trim(), // name
                         active: document.getElementById('swal-input2').checked, // active
-                        service_tag: document.getElementById('swal-input3').value === '' ? null : document.getElementById('swal-input3').value.trim(), // name
-                        ip: document.getElementById('swal-input4').value === '' ? null : document.getElementById('swal-input4').value.trim(), // password
-                        adquisition_date: document.getElementById('swal-input5').value, // id_computer
+                        service_tag: document.getElementById('swal-input3').value === '' ? null : document.getElementById('swal-input3').value.trim(), // service_tag
+                        ip: document.getElementById('swal-input4').value === '' ? null : document.getElementById('swal-input4').value.trim(), // ip
+                        adquisition_date: document.getElementById('swal-input5').value, // adquisition_date
                         comment: document.getElementById('swal-input6').value // comment
                     }
                 }
@@ -326,9 +269,6 @@ export default {
                 // VALIDATION CONSTANTS
                 const sameComputer = this.tempComputer === this.modalData.name;
                 const computerExists = this.findComputer(this.modalData.name).length > 0 ? true : false;
-                // const computerIdNotFound = this.findUserComputerId(this.computerData.id) === null;
-                // const sameIdOrNoComputerId =
-                // this.tempIdComputer === this.modalData.id_computer || this.modalData.id_computer === null;
                 const fieldsRequired =
                     this.modalData.name === null;
 
@@ -412,7 +352,7 @@ export default {
             table = document.getElementById("table");
             switching = true;
 
-            // Establece la dirección de orden inicial a ascendente
+            // SET THE STARTING ORDER DIRECTION TO ASCENDING
             dir = "asc";
             while (switching) {
                 switching = false;
@@ -450,7 +390,7 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos generales */
+/* GENERAL STYLES */
 .text-center {
     text-align: center;
 }
@@ -470,14 +410,13 @@ export default {
     font-weight: bolder;
     padding: 0 0 0 20px;
     border-bottom: 1px solid #e4e4e7;
-    /* Se reemplazó por la propiedad border-bottom */
 }
 
 .password-hidden {
     -webkit-text-security: disc !important;
 }
 
-/* Estilos de contenido */
+/* CONTENT STYLES */
 .content {
     padding: 30px;
     height: calc(100% - 60px);
@@ -502,16 +441,14 @@ export default {
     min-width: 50px;
 }
 
-/* Estilos de botones */
+/* BUTTON STYLES */
 .btn:hover {
     cursor: pointer;
     color: var(--dark);
     background-color: var(--btn-selected);
 }
 
-.btn {}
-
-/* Estilos de tablas */
+/* TABLE STYLES */
 .table-header th {
     font-weight: bold;
 }
@@ -545,7 +482,7 @@ tbody>tr:hover {
     background-color: var(--btn-selected);
 }
 
-/* Estilos responsivos */
+/* RESPONSIVE STYLES */
 @media screen and (max-width: 768px) {
     .input-search {
         width: 100%;
