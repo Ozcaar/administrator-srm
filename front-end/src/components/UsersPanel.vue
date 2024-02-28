@@ -25,22 +25,22 @@ import Swal from 'sweetalert2'
                     <table id="table">
                         <thead>
                             <tr class="table-header">
-                                <th @click="ordenarTabla(0)">Usuario</th>
+                                <th @click="ordenarTabla(0)" class="text-center">Usuario</th>
                                 <th @click="ordenarTabla(1)">Nombre</th>
                                 <th @click="ordenarTabla(2)">Contraseña</th>
-                                <th @click="ordenarTabla(3)">Activo</th>
-                                <th @click="ordenarTabla(4)">PC</th>
+                                <th @click="ordenarTabla(3)" class="text-center">Activo</th>
+                                <th @click="ordenarTabla(4)" class="text-center">PC</th>
                                 <th @click="ordenarTabla(5)">Comentarios</th>
                             </tr>
                         </thead>
                         <tbody class="table-body">
                             <tr v-for="user in users" :key="user.id" :id="`${user.id}`" class="user-row"
                                 @click="openModal(user)">
-                                <td>{{ user.user }}</td>
+                                <td class="text-center">{{ user.user }}</td>
                                 <td>{{ user.name }}</td>
                                 <td class="password password-hidden">{{ user.password }}</td>
-                                <td>{{ user.active }}</td>
-                                <td>{{ findComputer(user.id_computer)['name'] }}</td>
+                                <td class="text-center">{{ user.active ? 'Si' : 'No' }}</td>
+                                <td class="text-center">{{ findComputer(user.id_computer)['name'] }}</td>
                                 <td>{{ user.comment }}</td>
                             </tr>
                         </tbody>
@@ -485,6 +485,10 @@ export default {
 
 <style scoped>
 /* Estilos generales */
+.text-center {
+    text-align: center;
+}
+
 .container {
     width: 100%;
     overflow: hidden;
