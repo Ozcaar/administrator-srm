@@ -1,5 +1,4 @@
 <script setup>
-// import { RouterLink } from 'vue-router'
 import PanelView from '../views/PanelView.vue'
 
 import Swal from 'sweetalert2'
@@ -9,15 +8,15 @@ import Swal from 'sweetalert2'
     <PanelView>
         <div class="container">
             <div class="header">
-                <h2>Usuarios</h2>
+                <h2>Computadoras</h2>
             </div>
             <div class="content">
                 <div class="content-inputs">
                     <input id="input-search" class="input-search" type="text" placeholder="🔍 Búsqueda por nombre"
                         @input="searchByInput()" />
 
-                    <button class="btn" @click="openModal(newData())">🧑‍💼 Agregar usuario</button>
-                    <button class="btn btn-toggle" @click="togglePassword()">🙂 Mostrar contraseña</button>
+                    <button class="btn" @click="openModal(newData())">🖥️ Agregar computadora</button>
+                    <!-- <button class="btn btn-toggle" @click="togglePassword()">🙂 Mostrar contraseña</button> -->
                     <button class="btn"><strong>❔</strong></button>
                 </div>
 
@@ -25,23 +24,23 @@ import Swal from 'sweetalert2'
                     <table id="table">
                         <thead>
                             <tr class="table-header">
-                                <th @click="ordenarTabla(0)">Nombre</th>
-                                <th @click="ordenarTabla(1)">Activo</th>
-                                <th @click="ordenarTabla(2)">Service Tag</th>
-                                <th @click="ordenarTabla(3)">IP</th>
-                                <th @click="ordenarTabla(4)">Fecha de Adquisición</th>
+                                <th @click="ordenarTabla(0)" class="text-center">Nombre</th>
+                                <th @click="ordenarTabla(1)" class="text-center">Activo</th>
+                                <th @click="ordenarTabla(2)" class="text-center">Service Tag</th>
+                                <th @click="ordenarTabla(3)" class="text-center">IP</th>
+                                <th @click="ordenarTabla(4)" class="text-center">Fecha de Adquisición</th>
                                 <th @click="ordenarTabla(5)">Comentarios</th>
                             </tr>
                         </thead>
                         <tbody class="table-body">
-                            <tr v-for="user in users" :key="user.id" :id="`${user.id}`" class="user-row"
-                                @click="openModal(user)">
-                                <td>{{ user.name }}</td>
-                                <td>{{ user.active }}</td>
-                                <td>{{ user.service_tag }}</td>
-                                <td>{{ user.ip }}</td>
-                                <td>{{ user.adquisition_date }}</td>
-                                <td>{{ user.comment }}</td>
+                            <tr v-for="computer in computers" :key="computer.id" :id="`${computer.id}`" class="user-row"
+                                @click="openModal(computer)">
+                                <td class="text-center">{{ computer.name }}</td>
+                                <td class="text-center">{{ computer.active ? 'Si' : 'No' }}</td>
+                                <td class="text-center">{{ computer.service_tag }}</td>
+                                <td class="text-center">{{ computer.ip }}</td>
+                                <td class="text-center">{{ computer.adquisition_date }}</td>
+                                <td>{{ computer.comment }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -65,16 +64,7 @@ export default {
             computers: [],
             passwordHidden: true,
             originalPasswords: {},
-            // modalData: {
-            //     id: '',
-            //     user: '',
-            //     name: '',
-            //     password: '',
-            //     active: false,
-            //     id_computer: '',
-            //     comment: ''
-            // },
-            computerData: {
+            modalData: {
                 id: '',
                 name: '',
                 active: false,
@@ -82,7 +72,16 @@ export default {
                 ip: '',
                 adquisition_date: '',
                 comment: ''
-            }
+            },
+            // computerData: {
+            //     id: '',
+            //     name: '',
+            //     active: false,
+            //     service_tag: '',
+            //     ip: '',
+            //     adquisition_date: '',
+            //     comment: ''
+            // }
         }
     },
     mounted() {
@@ -120,7 +119,7 @@ export default {
                 });
 
                 if (!usersResponse.ok) {
-                    throw new Error('Network users response was not ok');
+                    throw new Error('Network computers response was not ok');
                 }
 
                 await this.fetchComputers()
@@ -129,6 +128,7 @@ export default {
                     icon: 'success'
                 });
             } catch (error) {
+                console.log(this.modalData);
                 console.error('There was a problem with the fetch operation:', error)
                 Swal.fire({
                     title: 'Error!',
@@ -137,14 +137,14 @@ export default {
                 });
             }
         },
-        // findUser(user_name) {
-        //     const user_name_list = this.users.filter((u) => u.user === user_name);
-        //     return user_name_list;
-        // },
-        findComputer(id) {
-            const computer = this.computers.find((c) => c.id === id);
-            return computer != null ? computer : '';
+        findComputer(computer_name) {
+            const computer_name_list = this.computers.filter((c) => c.name === computer_name);
+            return computer_name_list;
         },
+        // findComputer(id) {
+        //     const computer = this.computers.find((c) => c.id === id);
+        //     return computer != null ? computer : '';
+        // },
         findComputerByName(name) {
             const computer = this.computers.find((c) => c.name === name);
             return computer != null ? computer : null;
@@ -172,16 +172,16 @@ export default {
         openModal(computer) {
             this.modalData = {
                 id: computer.id,
-                name: computer.user,
-                active: computer.name,
-                service_tag: computer.password,
-                ip: computer.active,
-                adquisition_date: computer.id_computer,
+                name: computer.name,
+                active: computer.active,
+                service_tag: computer.service_tag,
+                ip: computer.ip,
+                adquisition_date: computer.adquisition_date,
                 comment: computer.comment
             }
 
-            // ABRIR MODAL DE MODIFICACIÓN DE USUARIO
-            this.tempUser = {}
+            // OPEN UPDATE COMPUTER MODAL
+            this.tempComputer = {}
             Swal.fire({
                 showCancelButton: true,
                 confirmButtonText: 'Modificar',
@@ -203,30 +203,24 @@ export default {
                                 <label style="display: none;">ID</label>
                                 <input style="display: none;" disabled value ="${this.modalData.id}" id="swal-input0" class="input input-text input-id" placeholder="[no modificable]" autocomplete="off">
 
-                                <label>Usuario</label>
-                                <input value ="${this.modalData.user.trim()}" id="swal-input1" class="input input-text" placeholder="Usuario / usrm" autocomplete="off">
-                                
                                 <label>Nombre</label>
-                                <input value ="${this.modalData.name}" id="swal-input2" class="input input-text" placeholder="Nombre de usuario" autocomplete="off">
+                                <input value ="${this.modalData.name ? this.modalData.name.trim() : ''}" id="swal-input1" class="input input-text" placeholder="Nombre" autocomplete="off">
                                 
-                                <div class="">
-                                    <label>Contraseña</label>
-                                    <div class="password-field">
-                                        <input value ="${this.modalData.password.trim()}" type="${this.modalData.password.trim() === 'N/A' || this.modalData.password.trim() === 'S/D' ? 'text' : 'password'}" id="swal-input3" class="input input-text" placeholder="Contraseña" autocomplete="off">
-                                        <input ${this.modalData.password.trim() === 'N/A' || this.modalData.password.trim() === 'S/D' ? 'checked' : ''} type="checkbox" id="show-hide-checkbox">
-                                        <span>Mostrar contraseña</span>
-                                    </div>
-                                </div>
+                                <label>Serice Tag</label>
+                                <input value ="${this.modalData.service_tag ? this.modalData.service_tag.trim() : ''}" id="swal-input3" class="input input-text" placeholder="Servive Tag" autocomplete="off">
 
-                                <label>PC</label>
-                                <input value ="${this.findComputer(this.modalData.id_computer)['name'] ? this.findComputer(this.modalData.id_computer)['name'] : ''}" id="swal-input5" class="input input-text" placeholder="Etiqueta de activo fijo" autocomplete="off">
+                                <label>IP</label>
+                                <input value ="${this.modalData.ip ? this.modalData.ip.trim() : ''}" id="swal-input4" class="input input-text" placeholder="Dirección IP" autocomplete="off">
+                                
+                                <label>Fecha de Adquisición</label>
+                                <input value ="${this.modalData.adquisition_date}" id="swal-input5" type="date" class="input input-text" placeholder="Fecha de Adquisición" autocomplete="off">
                                 
                                 <label>Comentarios</label>
                                 <textarea maxlength="300" id="swal-input6" class="input input-textarea" placeholder="Comentarios adicionales">${this.modalData.comment}</textarea>
                             
                                 <div>
-                                    <input ${this.modalData.active ? 'checked' : ''} id="swal-input4" type="checkbox" class="active-checkbox">
-                                    <span>Usuario activo</span>
+                                    <input ${this.modalData.active ? 'checked' : ''} id="swal-input2" type="checkbox" class="active-checkbox">
+                                    <span>Computadora activa    </span>
                                 </div>
                             </form>   
                             
@@ -259,19 +253,6 @@ export default {
 
                                 .input-id {
                                     color: gray;
-                                }
-
-                                .password-container{
-                                }
-                                
-                                .password-field {
-                                    margin-bottom: 20px
-                                }
-                                
-                                .show-hide-checkbox {
-                                    /*background-color: transparent;*/
-                                    padding: 30px;
-                                    margin-bottom: 25px;
                                 }
                                 
                                 input[type="checkbox"] ~ span{
@@ -307,85 +288,71 @@ export default {
                         document.getElementById('swal-input5').value.trim() != null
                     ) {
                         // VERIFICAR SI LA PC DADA YA EXISTE
-                        let computer = this.findComputerByName(document.getElementById('swal-input5').value);
-                        if (computer == null) {
-                            this.computerData = {
-                                id: null,
-                                name: document.getElementById('swal-input5').value,
-                                active: true,
-                                service_tag: null,
-                                ip: null,
-                                adquisition_date: '',
-                                comment: ''
-                            }
+                        // let computer = this.findComputerByName(document.getElementById('swal-input5').value);
+                        // if (computer == null) {
+                        //     this.computerData = {
+                        //         id: null,
+                        //         name: document.getElementById('swal-input5').value,
+                        //         active: true,
+                        //         service_tag: null,
+                        //         ip: null,
+                        //         adquisition_date: '',
+                        //         comment: ''
+                        //     }
 
-                            computer = await this.updateComputer();
-                        };
-                        this.computerData = computer;
+                        //     computer = await this.updateComputer();
+                        // };
+                        // this.computerData = computer;
                     }
 
-                    this.tempIdComputer = this.modalData.id_computer;
-                    this.tempUser = this.modalData.user;
+                    // this.tempIdComputer = this.modalData.id_computer;
+                    this.tempComputer = this.modalData.name;
 
                     // OBTENER LOS DATOS DE LOS INPUTS DEL MODAL Y GUARDARLOS
                     this.modalData = {
                         id: document.getElementById('swal-input0').value, // id
-                        user:
+                        name:
                             document.getElementById('swal-input1').value.trim() == ''
                                 ? null
-                                : document.getElementById('swal-input1').value, // user
-                        name: document.getElementById('swal-input2').value, // name
-                        password:
-                            document.getElementById('swal-input3').value.trim() == ''
-                                ? null
-                                : document.getElementById('swal-input3').value, // password
-                        active: document.getElementById('swal-input4').checked, // active
-                        id_computer: this.computerData['id'], // id_computer
+                                : document.getElementById('swal-input1').value === '' ? null : document.getElementById('swal-input1').value.trim(), // name
+                        active: document.getElementById('swal-input2').checked, // active
+                        service_tag: document.getElementById('swal-input3').value === '' ? null : document.getElementById('swal-input3').value.trim(), // name
+                        ip: document.getElementById('swal-input4').value === '' ? null : document.getElementById('swal-input4').value.trim(), // password
+                        adquisition_date: document.getElementById('swal-input5').value, // id_computer
                         comment: document.getElementById('swal-input6').value // comment
                     }
                 }
             }).then((result) => {
-                // CONSTANTES NECESARIAS PARA LA VALIDACIÓN
-                const sameUser = this.tempUser === this.modalData.user;
-                const userExists = this.findUser(this.modalData.user).length > 0 ? true : false;
-                const computerIdNotFound = this.findUserComputerId(this.computerData.id) === null;
-                const sameIdOrNoComputerId =
-                    this.tempIdComputer === this.modalData.id_computer || this.modalData.id_computer === null;
+                // VALIDATION CONSTANTS
+                const sameComputer = this.tempComputer === this.modalData.name;
+                const computerExists = this.findComputer(this.modalData.name).length > 0 ? true : false;
+                // const computerIdNotFound = this.findUserComputerId(this.computerData.id) === null;
+                // const sameIdOrNoComputerId =
+                // this.tempIdComputer === this.modalData.id_computer || this.modalData.id_computer === null;
                 const fieldsRequired =
-                    this.modalData.user === null ||
-                    this.modalData.name === null ||
-                    this.modalData.password === null;
+                    this.modalData.name === null;
 
-                //VALIDACIÓN DE DATOS INGRESADOS
+                // DATA VALIDATION
                 if (result.isConfirmed) {
                     try {
                         if (fieldsRequired) {
                             Swal.fire({
                                 title: 'Error!',
-                                text: 'Los campos "Usuario", "Nombre" y "Contraseña" son requeridos',
+                                text: 'El campo "Nombre" es requerido',
                                 icon: 'warning'
                             })
                             return;
                         }
 
-                        if (computerIdNotFound || sameIdOrNoComputerId) {
-                            if (!sameUser && userExists && this.tempUser === '') {
-                                Swal.fire({
-                                    title: 'Error!',
-                                    text: 'Ya existe otro registro con ese usuario',
-                                    icon: 'warning'
-                                })
-                                return;
-                            }
-                            this.updateUser()
-                        } else {
+                        if (!sameComputer && computerExists) {
                             Swal.fire({
-                                icon: 'error',
                                 title: 'Error!',
-                                text: 'Ya existe otro usuario registrado con esa PC'
+                                text: 'Ya existe otro registro con ese nombre',
+                                icon: 'warning'
                             })
                             return;
                         }
+                        this.updateComputer()
                     } catch (error) {
                         Swal.fire({
                             title: 'Error!',
@@ -409,11 +376,11 @@ export default {
 
             return {
                 id: '',
-                user: '',
                 name: '',
-                password: '',
-                active: false,
-                id_computer: '',
+                active: '',
+                service_tag: '',
+                ip: false,
+                adquisition_date: '',
                 comment: ''
             }
         },
@@ -435,9 +402,9 @@ export default {
             const inputSearch = document.getElementById("input-search").value;
 
             if (inputSearch !== '') {
-                this.users = this.auxUsers.filter(u => u.name.includes(inputSearch))
+                this.computers = this.auxComputers.filter(c => c.name.includes(inputSearch))
             } else {
-                this.users = this.auxUsers;
+                this.computers = this.auxComputers;
             }
         },
         ordenarTabla(n) {
@@ -484,6 +451,10 @@ export default {
 
 <style scoped>
 /* Estilos generales */
+.text-center {
+    text-align: center;
+}
+
 .container {
     width: 100%;
     overflow: hidden;
