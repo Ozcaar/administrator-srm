@@ -27,11 +27,12 @@ import { RouterLink } from 'vue-router'
                 <nav class="nav">
                     <RouterLink class="btn" to="/panel/users">Usuarios</RouterLink>
                     <RouterLink class="btn" to="/panel/computers">Computadoras</RouterLink>
-                    <!-- <RouterLink class="btn" to="/panel/correos">Correos</RouterLink> -->
-                    <!-- <RouterLink class="btn" to="/antivirus">Antivirus</RouterLink> -->
-                    <!-- <RouterLink class="btn" to="/office">Office</RouterLink> -->
-                    <!-- <RouterLink class="btn" to="/dameware">Dameware</RouterLink> -->
-                    <!-- <RouterLink class="btn" to="/extensiones">Extensiones</RouterLink> -->
+                    <RouterLink class="btn" to="/panel/passwords">Contraseñas SRM</RouterLink>
+                    <!-- <RouterLink class="btn" to="/panel/mails">Correos</RouterLink> -->
+                    <!-- <RouterLink class="btn" to="/panel/antivirus">Antivirus</RouterLink> -->
+                    <!-- <RouterLink class="btn" to="/panel/office">Office</RouterLink> -->
+                    <!-- <RouterLink class="btn" to="/panel/dameware">Dameware</RouterLink> -->
+                    <!-- <RouterLink class="btn" to="/panel/extensions">Extensiones</RouterLink> -->
                 </nav>
             </div>
         </aside>
@@ -52,11 +53,12 @@ import { RouterLink } from 'vue-router'
             <nav class="nav-mobile">
                 <RouterLink class="btn" to="/panel/users" @click="toggleCheckBox()">Usuarios</RouterLink>
                 <RouterLink class="btn" to="/panel/computers" @click="toggleCheckBox()">Computadoras</RouterLink>
-                <!-- <RouterLink class="btn" to="/panel/correos">Correos</RouterLink> -->
-                <!-- <RouterLink class="btn" to="/antivirus">Antivirus</RouterLink> -->
-                <!-- <RouterLink class="btn" to="/office">Office</RouterLink> -->
-                <!-- <RouterLink class="btn" to="/dameware">Dameware</RouterLink> -->
-                <!-- <RouterLink class="btn" to="/extensiones">Extensiones</RouterLink> -->
+                <RouterLink class="btn" to="/panel/passwords" @click="toggleCheckBox()">Contraseñas SRM</RouterLink>
+                <!-- <RouterLink class="btn" to="/panel/mails" @click="toggleCheckBox()">Correos</RouterLink> -->
+                <!-- <RouterLink class="btn" to="/panel/antivirus" @click="toggleCheckBox()">Antivirus</RouterLink> -->
+                <!-- <RouterLink class="btn" to="/panel/office" @click="toggleCheckBox()">Office</RouterLink> -->
+                <!-- <RouterLink class="btn" to="/panel/dameware" @click="toggleCheckBox()">Dameware</RouterLink> -->
+                <!-- <RouterLink class="btn" to="/panel/extensions" @click="toggleCheckBox()">Extensiones</RouterLink> -->
             </nav>
         </aside>
 
