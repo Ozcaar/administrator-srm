@@ -3,7 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import PanelView from '@/views/PanelView.vue'
 import UsersPanel from '@/components/UsersPanel.vue'
 import ComputersPanel from '@/components/ComputersPanel.vue'
-import UserModal from '@/components/UserModal.vue'
+import PasswordsPanel from '@/components/PasswordsPanel.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,9 +37,9 @@ const router = createRouter({
       component: ComputersPanel
     },
     {
-      path: "/modal",
+      path: "/panel/passwords",
       name: "modal",
-      component: UserModal
+      component: PasswordsPanel
     }
   ]
 })
