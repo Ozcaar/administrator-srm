@@ -170,6 +170,112 @@ export default {
             const jsonResponse = await computersResponse.json();
             return jsonResponse;
         },
+        modalHTML() {
+            return `
+                    <form class="form-container">
+                        <label style="display: none;">ID</label>
+                        <input style="display: none;" disabled value ="${this.modalData.id}" id="swal-input0" class="input input-text input-id" placeholder="[no modificable]" autocomplete="off">
+
+                        <label>Usuario</label>
+                        <input value ="${this.modalData.user.trim()}" id="swal-input1" class="input input-text" placeholder="Usuario / usrm" autocomplete="off">
+                        
+                        <label>Nombre</label>
+                        <input value ="${this.modalData.name}" id="swal-input2" class="input input-text" placeholder="Nombre de usuario" autocomplete="off">
+                        
+                        <div class="">
+                            <label>Contraseña</label>
+                            <div class="password-field">
+                                <input value ="${this.modalData.password.trim()}" type="${this.modalData.password.trim() === 'N/A' || this.modalData.password.trim() === 'S/D' ? 'text' : 'password'}" id="swal-input3" class="input input-text" placeholder="Contraseña" autocomplete="off">
+                                <input ${this.modalData.password.trim() === 'N/A' || this.modalData.password.trim() === 'S/D' ? 'checked' : ''} type="checkbox" id="show-hide-checkbox">
+                                <span>Mostrar contraseña</span>
+                            </div>
+                        </div>
+
+                        <label>PC</label>
+                        <input value ="${this.findComputer(this.modalData.id_computer)['name'] ? this.findComputer(this.modalData.id_computer)['name'] : ''}" id="swal-input5" class="input input-text" placeholder="Etiqueta de activo fijo" autocomplete="off">
+                        
+                        <label>Comentarios</label>
+                        <textarea maxlength="300" id="swal-input6" class="input input-textarea" placeholder="Comentarios adicionales">${this.modalData.comment}</textarea>
+                    
+                        <div>
+                            <input ${this.modalData.active ? 'checked' : ''} id="swal-input4" type="checkbox" class="active-checkbox">
+                            <span>Usuario activo</span>
+                        </div>
+                    </form>   
+                    
+                    <style>
+                    .form-container {
+                            margin: 0 auto;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: start;
+                            text-align: left;
+                            padding: 30px;
+                            font-family: sans-serif;
+                            width: 400px;
+                            user-select: none;
+                        }
+
+                        .input-text, .input-textarea {
+                            all: initial;
+                        }
+
+                        .input {
+                            background-color: #f0f0f0;
+                            border-radius: 10px;
+                            padding: 10px;
+                            margin: 5px 0 25px 0;
+                            font-size: 15px;
+                            font-family: sans-serif;
+                            width: 90%;
+                        }
+
+                        .input-id {
+                            color: gray;
+                        }
+
+                        .password-container{
+                        }
+                        
+                        .password-field {
+                            margin-bottom: 20px
+                        }
+                        
+                        .show-hide-checkbox {
+                            /*background-color: transparent;*/
+                            padding: 30px;
+                            margin-bottom: 25px;
+                        }
+                        
+                        input[type="checkbox"] ~ span{
+                            margin-left: 10px;
+                        }
+
+                        .input-textarea {
+                            width: 90%;
+                            height: 50px;
+                            padding: 10px;
+                            font-size: 16px;
+                            font-family: sans-serif;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            resize: vertical;
+                            min-height: 50px;
+                            max-height: 200px;
+                        }
+
+                        .input-textarea:focus {
+                            border-color: #bdbdbd;
+                        }
+
+                        @media screen and (max-width: 768px) {
+                        .form-container {
+                            width: 100%;
+                        }
+                    </style>
+                    `
+        }
+        ,
         openModal(user) {
             this.modalData = {
                 id: user.id,
@@ -199,109 +305,7 @@ export default {
                         });
                     }
                 },
-                html: `
-                            <form class="form-container">
-                                <label style="display: none;">ID</label>
-                                <input style="display: none;" disabled value ="${this.modalData.id}" id="swal-input0" class="input input-text input-id" placeholder="[no modificable]" autocomplete="off">
-
-                                <label>Usuario</label>
-                                <input value ="${this.modalData.user.trim()}" id="swal-input1" class="input input-text" placeholder="Usuario / usrm" autocomplete="off">
-                                
-                                <label>Nombre</label>
-                                <input value ="${this.modalData.name}" id="swal-input2" class="input input-text" placeholder="Nombre de usuario" autocomplete="off">
-                                
-                                <div class="">
-                                    <label>Contraseña</label>
-                                    <div class="password-field">
-                                        <input value ="${this.modalData.password.trim()}" type="${this.modalData.password.trim() === 'N/A' || this.modalData.password.trim() === 'S/D' ? 'text' : 'password'}" id="swal-input3" class="input input-text" placeholder="Contraseña" autocomplete="off">
-                                        <input ${this.modalData.password.trim() === 'N/A' || this.modalData.password.trim() === 'S/D' ? 'checked' : ''} type="checkbox" id="show-hide-checkbox">
-                                        <span>Mostrar contraseña</span>
-                                    </div>
-                                </div>
-
-                                <label>PC</label>
-                                <input value ="${this.findComputer(this.modalData.id_computer)['name'] ? this.findComputer(this.modalData.id_computer)['name'] : ''}" id="swal-input5" class="input input-text" placeholder="Etiqueta de activo fijo" autocomplete="off">
-                                
-                                <label>Comentarios</label>
-                                <textarea maxlength="300" id="swal-input6" class="input input-textarea" placeholder="Comentarios adicionales">${this.modalData.comment}</textarea>
-                            
-                                <div>
-                                    <input ${this.modalData.active ? 'checked' : ''} id="swal-input4" type="checkbox" class="active-checkbox">
-                                    <span>Usuario activo</span>
-                                </div>
-                            </form>   
-                            
-                            <style>
-                            .form-container {
-                                    margin: 0 auto;
-                                    display: flex;
-                                    flex-direction: column;
-                                    align-items: start;
-                                    text-align: left;
-                                    padding: 30px;
-                                    font-family: sans-serif;
-                                    width: 400px;
-                                    user-select: none;
-                                }
-
-                                .input-text, .input-textarea {
-                                    all: initial;
-                                }
-
-                                .input {
-                                    background-color: #f0f0f0;
-                                    border-radius: 10px;
-                                    padding: 10px;
-                                    margin: 5px 0 25px 0;
-                                    font-size: 15px;
-                                    font-family: sans-serif;
-                                    width: 90%;
-                                }
-
-                                .input-id {
-                                    color: gray;
-                                }
-
-                                .password-container{
-                                }
-                                
-                                .password-field {
-                                    margin-bottom: 20px
-                                }
-                                
-                                .show-hide-checkbox {
-                                    /*background-color: transparent;*/
-                                    padding: 30px;
-                                    margin-bottom: 25px;
-                                }
-                                
-                                input[type="checkbox"] ~ span{
-                                    margin-left: 10px;
-                                }
-
-                                .input-textarea {
-                                    width: 90%;
-                                    height: 50px;
-                                    padding: 10px;
-                                    font-size: 16px;
-                                    font-family: sans-serif;
-                                    border: 1px solid #ccc;
-                                    border-radius: 5px;
-                                    resize: vertical;
-                                    min-height: 50px;
-                                    max-height: 200px;
-                                }
-
-                                .input-textarea:focus {
-                                    border-color: #bdbdbd;
-                                }
-
-                                @media screen and (max-width: 768px) {
-                                .form-container {
-                                    width: 100%;
-                                }
-                            </style>
-                         `,
+                html: this.modalHTML(),
                 preConfirm: async () => {
                     if (
                         document.getElementById('swal-input5').value.trim() != '' &&
@@ -542,8 +546,6 @@ export default {
     color: var(--dark);
     background-color: var(--btn-selected);
 }
-
-.btn {}
 
 /* Estilos de tablas */
 .table-header th {

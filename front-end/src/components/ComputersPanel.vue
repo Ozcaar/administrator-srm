@@ -110,7 +110,6 @@ export default {
                     icon: 'success'
                 });
             } catch (error) {
-                console.log(this.modalData);
                 console.error('There was a problem with the fetch operation:', error)
                 Swal.fire({
                     title: 'Error!',
@@ -131,6 +130,93 @@ export default {
             const user = this.users.find((u) => u.id_computer === id_computer);
             return user != undefined ? user : null;
         },
+        modalHTML() {
+            return `
+                    <form class="form-container">
+                        <label style="display: none;">ID</label>
+                        <input style="display: none;" disabled value ="${this.modalData.id}" id="swal-input0" class="input input-text input-id" placeholder="[no modificable]" autocomplete="off">
+
+                        <label>Nombre</label>
+                        <input value ="${this.modalData.name ? this.modalData.name.trim() : ''}" id="swal-input1" class="input input-text" placeholder="Nombre" autocomplete="off">
+                        
+                        <label>Serice Tag</label>
+                        <input value ="${this.modalData.service_tag ? this.modalData.service_tag.trim() : ''}" id="swal-input3" class="input input-text" placeholder="Servive Tag" autocomplete="off">
+
+                        <label>IP</label>
+                        <input value ="${this.modalData.ip ? this.modalData.ip.trim() : ''}" id="swal-input4" class="input input-text" placeholder="Dirección IP" autocomplete="off">
+                        
+                        <label>Fecha de Adquisición</label>
+                        <input value ="${this.modalData.adquisition_date}" id="swal-input5" type="date" class="input input-text" placeholder="Fecha de Adquisición" autocomplete="off">
+                        
+                        <label>Comentarios</label>
+                        <textarea maxlength="300" id="swal-input6" class="input input-textarea" placeholder="Comentarios adicionales">${this.modalData.comment}</textarea>
+                    
+                        <div>
+                            <input ${this.modalData.active ? 'checked' : ''} id="swal-input2" type="checkbox" class="active-checkbox">
+                            <span>Computadora activa    </span>
+                        </div>
+                    </form>   
+                    
+                    <style>
+                    .form-container {
+                            margin: 0 auto;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: start;
+                            text-align: left;
+                            padding: 30px;
+                            font-family: sans-serif;
+                            width: 400px;
+                            user-select: none;
+                        }
+
+                        .input-text, .input-textarea {
+                            all: initial;
+                        }
+
+                        .input {
+                            background-color: #f0f0f0;
+                            border-radius: 10px;
+                            padding: 10px;
+                            margin: 5px 0 25px 0;
+                            font-size: 15px;
+                            font-family: sans-serif;
+                            width: 90%;
+                        }
+
+                        .input-id {
+                            color: gray;
+                        }
+                        
+                        input[type="checkbox"] ~ span{
+                            margin-left: 10px;
+                        }
+
+                        .input-textarea {
+                            width: 90%;
+                            height: 50px;
+                            padding: 10px;
+                            font-size: 16px;
+                            font-family: sans-serif;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            resize: vertical;
+                            min-height: 50px;
+                            max-height: 200px;
+                        }
+
+                        .input-textarea:focus {
+                            border-color: #bdbdbd;
+                        }
+
+                        @media screen and (max-width: 768px) {
+                        .form-container {
+                            width: 100%;
+                        }
+                    </style>
+                    `
+        }
+        ,
         openModal(computer) {
             this.modalData = {
                 id: computer.id,
@@ -160,96 +246,9 @@ export default {
                         });
                     }
                 },
-                html: `
-                            <form class="form-container">
-                                <label style="display: none;">ID</label>
-                                <input style="display: none;" disabled value ="${this.modalData.id}" id="swal-input0" class="input input-text input-id" placeholder="[no modificable]" autocomplete="off">
-
-                                <label>Nombre</label>
-                                <input value ="${this.modalData.name ? this.modalData.name.trim() : ''}" id="swal-input1" class="input input-text" placeholder="Nombre" autocomplete="off">
-                                
-                                <label>Serice Tag</label>
-                                <input value ="${this.modalData.service_tag ? this.modalData.service_tag.trim() : ''}" id="swal-input3" class="input input-text" placeholder="Servive Tag" autocomplete="off">
-
-                                <label>IP</label>
-                                <input value ="${this.modalData.ip ? this.modalData.ip.trim() : ''}" id="swal-input4" class="input input-text" placeholder="Dirección IP" autocomplete="off">
-                                
-                                <label>Fecha de Adquisición</label>
-                                <input value ="${this.modalData.adquisition_date}" id="swal-input5" type="date" class="input input-text" placeholder="Fecha de Adquisición" autocomplete="off">
-                                
-                                <label>Comentarios</label>
-                                <textarea maxlength="300" id="swal-input6" class="input input-textarea" placeholder="Comentarios adicionales">${this.modalData.comment}</textarea>
-                            
-                                <div>
-                                    <input ${this.modalData.active ? 'checked' : ''} id="swal-input2" type="checkbox" class="active-checkbox">
-                                    <span>Computadora activa    </span>
-                                </div>
-                            </form>   
-                            
-                            <style>
-                            .form-container {
-                                    margin: 0 auto;
-                                    display: flex;
-                                    flex-direction: column;
-                                    align-items: start;
-                                    text-align: left;
-                                    padding: 30px;
-                                    font-family: sans-serif;
-                                    width: 400px;
-                                    user-select: none;
-                                }
-
-                                .input-text, .input-textarea {
-                                    all: initial;
-                                }
-
-                                .input {
-                                    background-color: #f0f0f0;
-                                    border-radius: 10px;
-                                    padding: 10px;
-                                    margin: 5px 0 25px 0;
-                                    font-size: 15px;
-                                    font-family: sans-serif;
-                                    width: 90%;
-                                }
-
-                                .input-id {
-                                    color: gray;
-                                }
-                                
-                                input[type="checkbox"] ~ span{
-                                    margin-left: 10px;
-                                }
-
-                                .input-textarea {
-                                    width: 90%;
-                                    height: 50px;
-                                    padding: 10px;
-                                    font-size: 16px;
-                                    font-family: sans-serif;
-                                    border: 1px solid #ccc;
-                                    border-radius: 5px;
-                                    resize: vertical;
-                                    min-height: 50px;
-                                    max-height: 200px;
-                                }
-
-                                .input-textarea:focus {
-                                    border-color: #bdbdbd;
-                                }
-
-                                @media screen and (max-width: 768px) {
-                                .form-container {
-                                    width: 100%;
-                                }
-                            </style>
-                         `,
+                html: this.modalHTML(),
                 preConfirm: async () => {
-                    if (
-                        document.getElementById('swal-input5').value.trim() != '' &&
-                        document.getElementById('swal-input5').value.trim() != null
-                    )
-                        this.tempComputer = this.modalData.name;
+                    this.tempComputer = this.modalData.name;
 
                     // GET INPUT VALUES FROM MODAL AND SAVE IT
                     this.modalData = {
