@@ -28,7 +28,7 @@ import { RouterLink } from 'vue-router'
                     <RouterLink class="btn" to="/panel/users">Usuarios</RouterLink>
                     <RouterLink class="btn" to="/panel/computers">Computadoras</RouterLink>
                     <RouterLink class="btn" to="/panel/passwords">Contraseñas SRM</RouterLink>
-                    <!-- <RouterLink class="btn" to="/panel/mails">Correos</RouterLink> -->
+                    <RouterLink class="btn" to="/panel/mails">Correos</RouterLink>
                     <!-- <RouterLink class="btn" to="/panel/antivirus">Antivirus</RouterLink> -->
                     <!-- <RouterLink class="btn" to="/panel/office">Office</RouterLink> -->
                     <!-- <RouterLink class="btn" to="/panel/dameware">Dameware</RouterLink> -->
@@ -54,7 +54,7 @@ import { RouterLink } from 'vue-router'
                 <RouterLink class="btn" to="/panel/users" @click="toggleCheckBox()">Usuarios</RouterLink>
                 <RouterLink class="btn" to="/panel/computers" @click="toggleCheckBox()">Computadoras</RouterLink>
                 <RouterLink class="btn" to="/panel/passwords" @click="toggleCheckBox()">Contraseñas SRM</RouterLink>
-                <!-- <RouterLink class="btn" to="/panel/mails" @click="toggleCheckBox()">Correos</RouterLink> -->
+                <RouterLink class="btn" to="/panel/mails" @click="toggleCheckBox()">Correos</RouterLink>
                 <!-- <RouterLink class="btn" to="/panel/antivirus" @click="toggleCheckBox()">Antivirus</RouterLink> -->
                 <!-- <RouterLink class="btn" to="/panel/office" @click="toggleCheckBox()">Office</RouterLink> -->
                 <!-- <RouterLink class="btn" to="/panel/dameware" @click="toggleCheckBox()">Dameware</RouterLink> -->

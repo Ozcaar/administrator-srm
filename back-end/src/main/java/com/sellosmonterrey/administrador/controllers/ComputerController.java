@@ -3,7 +3,6 @@ package com.sellosmonterrey.administrador.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +13,9 @@ import com.sellosmonterrey.administrador.services.ComputerService;
 
 @RestController
 @RequestMapping("/computers")
-@CrossOrigin(origins = {"http://localhost:5173", "http://10.21.11.156:5173"})
+@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5173", "http://192.168.1.15:5173" })
 public class ComputerController {
-    
+
     @Autowired
     ComputerService computerService;
 
@@ -35,7 +34,6 @@ public class ComputerController {
         return computerService.getComputer(id);
     }
 
-
     // POST
 
     // Save a new computer
@@ -51,7 +49,6 @@ public class ComputerController {
         List<ComputerModel> savedComputers = computerService.saveComputerModels(computers);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedComputers);
     }
-
 
     // DELETE
 

@@ -1,9 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import PanelView from '@/views/PanelView.vue'
+import NotFound from '@/views/NotFound.vue'
+
 import UsersPanel from '@/components/UsersPanel.vue'
 import ComputersPanel from '@/components/ComputersPanel.vue'
 import PasswordsPanel from '@/components/PasswordsPanel.vue'
+import MailsPanel from '@/components/MailsPanel.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,8 +41,24 @@ const router = createRouter({
     },
     {
       path: "/panel/passwords",
-      name: "modal",
+      name: "passwords",
       component: PasswordsPanel
+    },
+    {
+      path: "/panel/mails",
+      name: "mails",
+      component: MailsPanel
+    },
+    // REDIRECT UNKNOWN URL
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/404'
+    },
+    // NOT FOUND 404
+    {
+      path: '/404',
+      name: 'NotFound',
+      component: NotFound
     }
   ]
 })

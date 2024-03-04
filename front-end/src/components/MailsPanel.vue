@@ -8,14 +8,14 @@ import Swal from 'sweetalert2'
     <PanelView>
         <div class="container">
             <div class="header">
-                <h2>Contraseñas SRM</h2>
+                <h2>Correos</h2>
             </div>
             <div class="content">
                 <div class="content-inputs">
-                    <input id="input-search" class="input-search" type="text" placeholder="🔍 Búsqueda por servicio"
+                    <input id="input-search" class="input-search" type="text" placeholder="🔍 Búsqueda por correo"
                         @input="searchByInput()" />
 
-                    <button class="btn" @click="openModal(newData())">🔐 Agregar servicio</button>
+                    <button class="btn" @click="openModal(newData())">📧 Agregar correo</button>
                     <button class="btn btn-toggle" @click="togglePassword()">🙂 Mostrar contraseñas</button>
                     <button class="btn"><strong>❔</strong></button>
                 </div>
@@ -26,18 +26,19 @@ import Swal from 'sweetalert2'
                             <tr class="table-header">
                                 <th @click="ordenarTabla(0)">Servicio</th>
                                 <th @click="ordenarTabla(1)">Usuario</th>
-                                <th @click="ordenarTabla(2)">Contraseña</th>
-                                <th @click="ordenarTabla(3)">Liga de Acceso</th>
+                                <th @click="ordenarTabla(2)">Correo</th>
+                                <th @click="ordenarTabla(3)">Contraseña</th>
+                                <th @click="ordenarTabla(4)">Correo de Recuperación</th>
                             </tr>
                         </thead>
                         <tbody class="table-body">
-                            <tr v-for="service in services" :key="service.id" :id="`${service.id}`" class="user-row"
-                                @click="openModal(service)">
-                                <td>{{ service.service }}</td>
-                                <td>{{ service.user }}</td>
-                                <td class="password password-hidden">{{ service.password }}</td>
-                                <td><a :href="`${validLink(service.access_link)}`" target="_blank">{{ service.access_link
-                                }}</a></td>
+                            <tr v-for="mail in mails" :key="mail.id" :id="`${mail.id}`" class="user-row"
+                                @click="openModal(mail)">
+                                <td>{{ mail.service }}</td>
+                                <td>{{ mail.user }}</td>
+                                <td>{{ mail.mail }}</td>
+                                <td class="password password-hidden">{{ mail.password }}</td>
+                                <td>{{ mail.recovery_mail }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -55,39 +56,40 @@ export default {
             url: 'http://10.21.11.156:8080',
             // url: 'http://localhost:8080',
             // url: 'http://192.168.1.15:8080',
-            tempService: {},
+            tempMail: {},
             // users: [],
-            auxServices: [],
-            services: [],
+            auxMails: [],
+            mails: [],
             passwordHidden: true,
             originalPasswords: {},
             modalData: {
                 id: '',
                 service: '',
                 user: '',
+                mail: '',
                 password: '',
-                access_link: '',
+                recovery_mail: '',
             },
         }
     },
     mounted() {
-        this.fetchServices()
+        this.fetchMails()
     },
     methods: {
-        async fetchServices() {
+        async fetchMails() {
             try {
-                const response = await fetch(this.url + '/services');
+                const response = await fetch(this.url + '/mails');
                 const data = await response.json();
-                this.services = data;
-                this.auxServices = data;
+                this.mails = data;
+                this.auxMails = data;
                 document.getElementById("input-search").value = '';
             } catch (error) {
                 console.error('Error al obtener las cuentas:', error)
             }
         },
-        async updateService() {
+        async updateMail() {
             try {
-                const usersResponse = await fetch(this.url + '/services', {
+                const usersResponse = await fetch(this.url + '/mails', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -100,7 +102,7 @@ export default {
                     throw new Error('Network computers response was not ok');
                 }
 
-                await this.fetchServices()
+                await this.fetchMails()
                 Swal.fire({
                     title: 'Hecho!',
                     icon: 'success'
@@ -114,16 +116,16 @@ export default {
                 });
             }
         },
-        findService(service_user) {
-            const service_user_list = this.services.filter((s) => s.user === service_user);
-            return service_user_list;
+        findMail(mail_user_list) {
+            const mail_user_list_list = this.mails.filter((m) => m.user === mail_user_list);
+            return mail_user_list_list;
         },
-        findServiceByName(user) {
-            const computer = this.services.find((c) => c.name === user);
+        findMailByName(user) {
+            const computer = this.mails.find((c) => c.name === user);
             return computer != null ? computer : null;
         },
-        findServiceId(id_service) {
-            const service = this.services.find((u) => u.id_computer === id_service);
+        findMailId(id_service) {
+            const service = this.mails.find((u) => u.id_computer === id_service);
             return service != undefined ? service : null;
         },
         modalHTML() {
@@ -138,17 +140,20 @@ export default {
                         <label>Usuario</label>
                         <input value ="${this.modalData.user ? this.modalData.user : ''}" id="swal-input2" class="input input-text" placeholder="Usuario de Acceso" autocomplete="off">
 
+                        <label>Correo</label>
+                        <input value ="${this.modalData.mail ? this.modalData.mail : ''}" id="swal-input3" class="input input-text" placeholder="Usuario de Acceso" autocomplete="off">
+
                         <div class="">
                             <label>Contraseña</label>
                             <div class="password-field">
-                                <input value ="${this.modalData.password}" type="${this.modalData.password === 'N/A' || this.modalData.password === 'S/D' ? 'text' : 'password'}" id="swal-input3" class="input input-text" placeholder="Contraseña" autocomplete="off">
+                                <input value ="${this.modalData.password}" type="${this.modalData.password === 'N/A' || this.modalData.password === 'S/D' ? 'text' : 'password'}" id="swal-input4" class="input input-text" placeholder="Contraseña" autocomplete="off">
                                 <input ${this.modalData.password === 'N/A' || this.modalData.password === 'S/D' ? 'checked' : ''} type="checkbox" id="show-hide-checkbox">
                                 <span>Mostrar contraseña</span>
                             </div>
                         </div>
 
-                        <label>Liga de Acceso</label>
-                        <input value ="${this.modalData.access_link ? this.modalData.access_link : ''}" id="swal-input4" class="input input-text" placeholder="Liga de Acceso" autocomplete="off">
+                        <label>Correo de recuperación</label>
+                        <input value ="${this.modalData.recovery_mail ? this.modalData.recovery_mail : ''}" id="swal-input5" class="input input-text" placeholder="Liga de Acceso" autocomplete="off">
                     </form>   
                     
                     <style>
@@ -224,17 +229,18 @@ export default {
                     `
         }
         ,
-        openModal(service) {
+        openModal(mail) {
             this.modalData = {
-                id: service.id,
-                service: service.service,
-                user: service.user,
-                password: service.password,
-                access_link: service.access_link,
+                id: mail.id,
+                service: mail.service,
+                user: mail.user,
+                mail: mail.mail,
+                password: mail.password,
+                recovery_mail: mail.recovery_mail,
             }
 
-            // OPEN UPDATE COMPUTER MODAL
-            this.tempService = {}
+            // OPEN UPDATE MAIL MODAL
+            this.tempMail = {}
             Swal.fire({
                 showCancelButton: true,
                 confirmButtonText: 'Modificar',
@@ -244,7 +250,7 @@ export default {
                     const checkbox = document.getElementById('show-hide-checkbox');
                     if (checkbox) {
                         checkbox.addEventListener('click', () => {
-                            const passwordInput = document.getElementById('swal-input3');
+                            const passwordInput = document.getElementById('swal-input4');
                             if (passwordInput) {
                                 passwordInput.type = checkbox.checked ? 'text' : 'password';
                             }
@@ -253,7 +259,7 @@ export default {
                 },
                 html: this.modalHTML(),
                 preConfirm: async () => {
-                    // this.tempService = this.modalData.name;
+                    // this.tempMail = this.modalData.name;
 
                     // GET INPUT VALUES FROM MODAL AND SAVE IT
                     this.modalData = {
@@ -263,16 +269,20 @@ export default {
                                 ? null
                                 : document.getElementById('swal-input1').value === '' ? null : document.getElementById('swal-input1').value, // service
                         user: document.getElementById('swal-input2').value, // user
-                        password: document.getElementById('swal-input3').value === '' ? null : document.getElementById('swal-input3').value, // password
-                        access_link: document.getElementById('swal-input4').value === '' ? null : document.getElementById('swal-input4').value, // access link
+                        mail: document.getElementById('swal-input3').value, // mail
+                        password: document.getElementById('swal-input4').value === '' ? null : document.getElementById('swal-input4').value, // password
+                        recovery_mail: document.getElementById('swal-input5').value === '' ? null : document.getElementById('swal-input5').value, // recovery mail
                     }
                 }
             }).then((result) => {
                 // VALIDATION CONSTANTS
-                // const sameComputer = this.tempService === this.modalData.name;
-                // const computerExists = this.findService(this.modalData.name).length > 0 ? true : false;
+                // const sameComputer = this.tempMail === this.modalData.name;
+                // const computerExists = this.findMail(this.modalData.name).length > 0 ? true : false;
                 const fieldsRequired =
-                    this.modalData.service === null;
+                    this.modalData.service === null ||
+                    this.modalData.user === null ||
+                    this.modalData.mail === null ||
+                    this.modalData.password === null;
 
                 // DATA VALIDATION
                 if (result.isConfirmed) {
@@ -280,7 +290,7 @@ export default {
                         if (fieldsRequired) {
                             Swal.fire({
                                 title: 'Error!',
-                                text: 'El campo "Servicio" es requerido',
+                                text: 'Los campos "Servicio", "Usuario", "Correo" y "Contraseña", son requeridos',
                                 icon: 'warning'
                             })
                             return;
@@ -294,7 +304,7 @@ export default {
                         //     })
                         //     return;
                         // }
-                        this.updateService()
+                        this.updateMail()
                     } catch (error) {
                         Swal.fire({
                             title: 'Error!',
@@ -310,16 +320,18 @@ export default {
                 id: null,
                 service: null,
                 user: null,
+                mail: null,
                 password: null,
-                access_link: null,
+                recovery_mail: null,
             }
 
             return {
                 id: '',
                 service: '',
                 user: '',
+                mail: '',
                 password: '',
-                access_link: false,
+                recovery_mail: '',
             }
         },
         togglePassword() {
@@ -340,9 +352,9 @@ export default {
             const inputSearch = document.getElementById("input-search").value;
 
             if (inputSearch !== '') {
-                this.services = this.auxServices.filter(s => s.service.includes(inputSearch))
+                this.mails = this.auxMails.filter(s => s.service.includes(inputSearch))
             } else {
-                this.services = this.auxServices;
+                this.mails = this.auxMails;
             }
         },
         ordenarTabla(n) {

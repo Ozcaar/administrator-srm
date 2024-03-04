@@ -489,6 +489,7 @@ export default {
 
 <style scoped>
 /* Estilos generales */
+
 .text-center {
     text-align: center;
 }

@@ -10,7 +10,7 @@ public class UserModel {
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(unique = true, nullable = false)
     private String user;
 
@@ -21,11 +21,9 @@ public class UserModel {
     private Boolean active;
 
     private String name;
+    @Column(unique = true, nullable = true)
     private Long id_computer;
     private String comment;
-
-
-
 
     public Long getId_computer() {
         return id_computer;
