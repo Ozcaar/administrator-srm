@@ -21,7 +21,7 @@ public class UserModel {
     private Boolean active;
 
     private String name;
-    @Column(unique = true, nullable = true)
+    // @Column(unique = true, nullable = true)
     private Long id_computer;
     private String comment;
 

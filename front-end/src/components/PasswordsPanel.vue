@@ -36,8 +36,9 @@ import Swal from 'sweetalert2'
                                 <td>{{ service.service }}</td>
                                 <td>{{ service.user }}</td>
                                 <td class="password password-hidden">{{ service.password }}</td>
-                                <td><a :href="`${validLink(service.access_link)}`" target="_blank">{{ service.access_link
-                                }}</a></td>
+                                <td><a :href="`${validLink(service.access_link)}`" target="_blank">{{
+                            service.access_link
+                                        }}</a></td>
                             </tr>
                         </tbody>
                     </table>
@@ -521,4 +522,3 @@ tbody>tr:hover {
     }
 }
 </style>
-
