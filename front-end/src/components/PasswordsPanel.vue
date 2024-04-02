@@ -38,7 +38,7 @@ import Swal from 'sweetalert2'
                                 <td class="password password-hidden">{{ service.password }}</td>
                                 <td><a :href="`${validLink(service.access_link)}`" target="_blank">{{
                             service.access_link
-                                        }}</a></td>
+                        }}</a></td>
                             </tr>
                         </tbody>
                     </table>

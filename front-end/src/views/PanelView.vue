@@ -33,6 +33,7 @@ import { RouterLink } from 'vue-router'
                     <!-- <RouterLink class="btn" to="/panel/office">Office</RouterLink> -->
                     <!-- <RouterLink class="btn" to="/panel/dameware">Dameware</RouterLink> -->
                     <!-- <RouterLink class="btn" to="/panel/extensions">Extensiones</RouterLink> -->
+                    <a class="btn backup-btn" @click="downloadData()">Guardar y descargar datos</a>
                 </nav>
             </div>
         </aside>
@@ -59,6 +60,7 @@ import { RouterLink } from 'vue-router'
                 <!-- <RouterLink class="btn" to="/panel/office" @click="toggleCheckBox()">Office</RouterLink> -->
                 <!-- <RouterLink class="btn" to="/panel/dameware" @click="toggleCheckBox()">Dameware</RouterLink> -->
                 <!-- <RouterLink class="btn" to="/panel/extensions" @click="toggleCheckBox()">Extensiones</RouterLink> -->
+                <a class="btn" @click="downloadData()">Guardar y descargar datos</a>
             </nav>
         </aside>
 
@@ -70,6 +72,7 @@ import { RouterLink } from 'vue-router'
 export default {
     data() {
         return {
+            url: 'http://10.21.11.156:8080'
         }
     },
     mounted() {
@@ -77,6 +80,37 @@ export default {
     methods: {
         async toggleCheckBox() {
             document.getElementById("input-menu").checked = false;
+        },
+        async downloadData() {
+            try {
+                // const response = await fetch(this.url + '/admin/backup');
+                await fetch(this.url + '/admin/backup');
+                // const data = await response.json();
+            } catch (error) {
+                console.error('Error al realizar el reespaldo:', error);
+            }
+
+            try {
+                const response = await fetch(this.url + '/admin/backup/downloadBackup');
+                if (!response.ok) {
+                    throw new Error('Error downloading data: ' + response.statusText);
+                }
+
+                // Create a blob object from the response
+                const blob = await response.blob();
+
+                // Create a downloadable link (optional)
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'backup.csv';
+                link.click();
+
+                // Alternatively, trigger a custom event to handle download elsewhere
+                const downloadEvent = new CustomEvent('download', { detail: blob });
+                document.dispatchEvent(downloadEvent);
+            } catch (error) {
+                console.error('Error downloading data:', error);
+            }
         }
     }
 }
@@ -110,10 +144,10 @@ export default {
     justify-content: center;
     align-items: center;
     background-color: var(--white);
-    background-color: white;
 
     /* border-bottom: var(--light-gray) solid 1px; */
     border-bottom: 1px solid #e4e4e7;
+    background-image: url("../../public/imgs/dot-grid.png");
 }
 
 .header {
@@ -154,6 +188,11 @@ export default {
 .btn-menu,
 .sidebar-container-mobile {
     display: none;
+}
+
+.backup-btn {
+    -ms-flex-align: end;
+    bottom: 0;
 }
 
 /* RESPONSIVE */

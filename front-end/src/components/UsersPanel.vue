@@ -522,6 +522,7 @@ export default {
     height: calc(100% - 60px);
     display: flex;
     flex-direction: column;
+    background-image: url(../../public/imgs/dot-grid.png);
 }
 
 .content-inputs {
@@ -556,12 +557,14 @@ export default {
 .table-container {
     overflow: scroll;
     flex-grow: 1;
+    background-color: white;
+    border: 1px solid #ddd;
+
 }
 
 table {
     font-family: Arial, sans-serif;
     border-collapse: collapse;
-    border-radius: 10px;
     width: 100%;
     user-select: none;
 }

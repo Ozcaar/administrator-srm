@@ -7,10 +7,16 @@ import UsersPanel from '@/components/UsersPanel.vue'
 import ComputersPanel from '@/components/ComputersPanel.vue'
 import PasswordsPanel from '@/components/PasswordsPanel.vue'
 import MailsPanel from '@/components/MailsPanel.vue'
+import AuthView from '@/views/AuthView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/auth',
+      name: 'auth',
+      component: AuthView
+    },
     {
       path: '/',
       name: 'home',
