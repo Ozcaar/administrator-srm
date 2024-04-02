@@ -74,7 +74,7 @@ public class BackupController {
 
             // Write admins
             for (AdminModel admin : admins) {
-                writer.write(admin.getId() + "," + admin.getPasswordHashed() + "," + admin.getSalt());
+                writer.write(admin.getId() + "," + admin.getPassword() + "," + admin.getSalt());
                 writer.newLine();
             }
             writer.newLine();

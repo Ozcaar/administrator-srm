@@ -15,7 +15,7 @@ public class AdminModel {
     private String username;
 
     @Column(nullable = false)
-    private String passwordHashed;
+    private String password;
 
     @Column(nullable = false)
     private String salt;
@@ -39,12 +39,12 @@ public class AdminModel {
         this.username = username;
     }
 
-    public String getPasswordHashed() {
-        return passwordHashed;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordHashed(String passwordHashed) {
-        this.passwordHashed = passwordHashed;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getSalt() {

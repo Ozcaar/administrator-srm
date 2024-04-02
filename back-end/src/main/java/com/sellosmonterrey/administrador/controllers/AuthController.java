@@ -35,7 +35,7 @@ public class AuthController {
             AdminModel admin = adminOptional.get();
 
             // Verify password
-            if (verifyPassword(password, admin.getPasswordHashed())) {
+            if (verifyPassword(admin.getSalt() + password, admin.getPassword())) {
                 String token = generateToken(); // Generate random token
                 admin.setToken(token); // Update the token in the admin's table of db
                 adminRepository.save(admin);
@@ -46,10 +46,13 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    private boolean verifyPassword(String rawPassword, String hashedPassword) {
-        // Verfy if password provided matches with the hash in the db
+    private boolean verifyPassword(String saltedPassword, String hashedPassword) {
+
+        // Prepare encoder
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder.matches(rawPassword, hashedPassword);
+
+        // Verify if both password matches
+        return passwordEncoder.matches(saltedPassword, hashedPassword);
     }
 
     private String generateToken() {

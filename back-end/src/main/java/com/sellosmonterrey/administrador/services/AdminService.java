@@ -1,11 +1,15 @@
 package com.sellosmonterrey.administrador.services;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sellosmonterrey.administrador.models.AdminModel;
@@ -47,6 +51,43 @@ public class AdminService {
             return false;
         } catch (Exception err) {
             return false;
+        }
+    }
+
+    // ENCODE PASSWORD
+
+    public String encodePassword(String rawPassword) {
+
+        // Generate the salt
+        int saltLength = 16;
+        String salt = generateSalt(saltLength);
+
+        // Get password from AdminModel instance
+        String password = rawPassword;
+
+        // Combine salt and password
+        String saltedPassword = salt + password;
+
+        // Prepare encoder
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+        // Encode password
+        String passwordHashed = passwordEncoder.encode(saltedPassword);
+
+        return passwordHashed;
+    }
+
+    // SALT GENERATOR
+
+    public static String generateSalt(int length) {
+        try {
+            byte[] salt = new byte[length];
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            random.nextBytes(salt);
+            return Base64.getEncoder().encodeToString(salt);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
