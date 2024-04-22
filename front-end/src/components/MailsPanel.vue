@@ -16,11 +16,14 @@ import Swal from 'sweetalert2'
                         @input="searchByInput()" />
 
                     <button class="btn" @click="openModal(newData())">📧 Agregar correo</button>
-                    <button class="btn btn-toggle" @click="togglePassword()">🙂 Mostrar contraseñas</button>
-                    <button class="btn"><strong>❔</strong></button>
+                    <button class="btn btn-toggle" @click="togglePassword()">🔓 Mostrar contraseñas</button>
+                    <!-- <button class="btn"><strong>❔</strong></button> -->
                 </div>
 
                 <div class="table-container" @click="handleClick">
+                    <div class="spinner-table" ref="spinnerTable" style="display: flex;">
+                        <div class="spinner"></div>
+                    </div>
                     <table id="table">
                         <thead>
                             <tr class="table-header">
@@ -32,8 +35,7 @@ import Swal from 'sweetalert2'
                             </tr>
                         </thead>
                         <tbody class="table-body">
-                            <tr v-for="mail in mails" :key="mail.id" :id="`${mail.id}`" class="user-row"
-                                @click="openModal(mail)">
+                            <tr v-for="mail in mails" :key="mail.id" :id="`${mail.id}`" @click="openModal(mail)">
                                 <td>{{ mail.service }}</td>
                                 <td>{{ mail.user }}</td>
                                 <td>{{ mail.mail }}</td>
@@ -56,6 +58,11 @@ export default {
             url: 'http://10.21.11.156:8080',
             // url: 'http://localhost:8080',
             // url: 'http://192.168.1.15:8080',
+            urlWithParams: '',
+            params: {
+                username: sessionStorage.getItem('srm-admin-user'),
+                token: sessionStorage.getItem('srm-admin-token')
+            },
             tempMail: {},
             // users: [],
             auxMails: [],
@@ -73,23 +80,26 @@ export default {
         }
     },
     mounted() {
-        this.fetchMails()
+        this.urlWithParams = new URL(this.url + '/mails');
+        this.urlWithParams.search = new URLSearchParams(this.params).toString();
+        this.fetchMails();
     },
     methods: {
         async fetchMails() {
             try {
-                const response = await fetch(this.url + '/mails');
+                const response = await fetch(this.urlWithParams);
                 const data = await response.json();
                 this.mails = data;
                 this.auxMails = data;
                 document.getElementById("input-search").value = '';
+                this.$refs.spinnerTable.style.display = 'none';
             } catch (error) {
                 console.error('Error al obtener las cuentas:', error)
             }
         },
         async updateMail() {
             try {
-                const usersResponse = await fetch(this.url + '/mails', {
+                const usersResponse = await fetch(this.urlWithParams, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -99,7 +109,7 @@ export default {
                 });
 
                 if (!usersResponse.ok) {
-                    throw new Error('Network computers response was not ok');
+                    throw new Error('Network mails response was not ok');
                 }
 
                 await this.fetchMails()
@@ -112,6 +122,37 @@ export default {
                 Swal.fire({
                     title: 'Error!',
                     text: '(2) Hay un error en la captura de los datos: ' + error,
+                    icon: 'warning'
+                });
+            }
+        },
+        async deleteMail() {
+            try {
+                const deleteURL = new URL(this.url + '/mails' + '/' + this.modalData.id);
+                deleteURL.search = new URLSearchParams(this.params).toString();
+                const usersResponse = await fetch(deleteURL, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // KEYS DEL CORS
+                    },
+                    body: JSON.stringify(this.modalData)
+                });
+
+                if (!usersResponse.ok) {
+                    throw new Error('Network mails response was not ok');
+                }
+
+                await this.fetchMails()
+                Swal.fire({
+                    title: 'Eliminado!',
+                    icon: 'error'
+                });
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error)
+                Swal.fire({
+                    title: 'Error!',
+                    text: '(3) Hay un error en la captura de los datos: ' + error,
                     icon: 'warning'
                 });
             }
@@ -243,7 +284,9 @@ export default {
             this.tempMail = {}
             Swal.fire({
                 showCancelButton: true,
+                showDenyButton: this.modalData.id != '' ? true : false,
                 confirmButtonText: 'Modificar',
+                denyButtonText: 'Eliminar',
                 cancelButtonText: 'Cancelar',
                 didRender: () => {
                     // TOGGLE HIDE PASSWORD IN THE MODAL
@@ -276,8 +319,6 @@ export default {
                 }
             }).then((result) => {
                 // VALIDATION CONSTANTS
-                // const sameComputer = this.tempMail === this.modalData.name;
-                // const computerExists = this.findMail(this.modalData.name).length > 0 ? true : false;
                 const fieldsRequired =
                     this.modalData.service === null ||
                     this.modalData.user === null ||
@@ -295,15 +336,6 @@ export default {
                             })
                             return;
                         }
-
-                        // if (!sameComputer && computerExists) {
-                        //     Swal.fire({
-                        //         title: 'Error!',
-                        //         text: 'Ya existe otro registro con ese nombre',
-                        //         icon: 'warning'
-                        //     })
-                        //     return;
-                        // }
                         this.updateMail()
                     } catch (error) {
                         Swal.fire({
@@ -312,7 +344,21 @@ export default {
                             icon: 'warning'
                         });
                     }
-                }
+                } else if (result.isDenied) {
+                    Swal.fire({
+                        showConfirmButton: true,
+                        showDenyButton: true,
+                        confirmButtonText: 'Confirmar',
+                        denyButtonText: 'Cancelar',
+                        text: '¿Desea eliminar el correo ' + this.modalData.mail + ' ?',
+                    }).then((res) => {
+                        if (res.isConfirmed) {
+                            this.deleteMail();
+                        } else if (res.isDenied) {
+                            Swal.fire("Cancelado", "", "info")
+                        }
+                    });
+                };
             })
         },
         newData() {
@@ -340,22 +386,28 @@ export default {
             document.querySelectorAll('.password').forEach((cell) => {
                 if (this.passwordHidden) {
                     cell.classList.remove('password-hidden');
-                    toggleButton.textContent = '😌 Ocultar contraseñas';
+                    toggleButton.textContent = '🔒 Ocultar contraseñas';
                 } else {
                     cell.classList.add('password-hidden');
-                    toggleButton.textContent = '🙂 Mostrar contraseñas';
+                    toggleButton.textContent = '🔓 Mostrar contraseñas';
                 }
             })
             this.passwordHidden = !this.passwordHidden
         },
         searchByInput() {
-            const inputSearch = document.getElementById("input-search").value;
+            const inputSearch = this.removeAccents(document.getElementById("input-search").value.toLowerCase());
 
             if (inputSearch !== '') {
-                this.mails = this.auxMails.filter(s => s.service.includes(inputSearch))
+                this.mails = this.auxMails.filter(m => {
+                    const nameWithoutAccents = this.removeAccents(m.user.toLowerCase());
+                    return nameWithoutAccents.includes(inputSearch);
+                });
             } else {
                 this.mails = this.auxMails;
             }
+        },
+        removeAccents(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         },
         ordenarTabla(n) {
             var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
@@ -409,127 +461,4 @@ export default {
 }
 </script>
 
-<style scoped>
-/* GENERAL STYLES */
-.text-center {
-    text-align: center;
-}
-
-.container {
-    width: 100%;
-    overflow: hidden;
-}
-
-.header {
-    height: 60px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    background-color: #f5f5f5;
-    font-family: system-ui, sans-serif;
-    font-weight: bolder;
-    padding: 0 0 0 20px;
-    border-bottom: 1px solid #e4e4e7;
-}
-
-.password-hidden {
-    -webkit-text-security: disc !important;
-}
-
-/* CONTENT STYLES */
-.content {
-    padding: 30px;
-    height: calc(100% - 60px);
-    display: flex;
-    flex-direction: column;
-}
-
-.content-inputs {
-    display: flex;
-}
-
-.input-search,
-.btn {
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 20px;
-    font-size: 15px;
-    color: #6b7280;
-    border: #e4e4e7 1px solid;
-    height: 50px;
-    margin-right: 5px;
-    min-width: 50px;
-}
-
-/* BUTTON STYLES */
-.btn:hover {
-    cursor: pointer;
-    color: var(--dark);
-    background-color: var(--btn-selected);
-}
-
-/* TABLE STYLES */
-.table-header th {
-    font-weight: bold;
-}
-
-.table-container {
-    overflow: scroll;
-    flex-grow: 1;
-}
-
-table {
-    font-family: Arial, sans-serif;
-    border-collapse: collapse;
-    border-radius: 10px;
-    width: 100%;
-    user-select: none;
-}
-
-th,
-td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    cursor: pointer;
-}
-
-tbody>tr:hover {
-    cursor: pointer;
-    background-color: var(--btn-selected);
-}
-
-/* RESPONSIVE STYLES */
-@media screen and (max-width: 768px) {
-    .input-search {
-        width: 100%;
-    }
-
-    .btn {
-        border-radius: 10px;
-        padding: 10px;
-        margin-bottom: 20px;
-        font-size: 13px;
-        color: #6b7280;
-        border: #e4e4e7 1px solid;
-        height: 50px;
-        margin-right: 5px;
-        min-width: 50px;
-    }
-
-    .content {
-        padding: 15px;
-    }
-
-    .table-container {
-        border: 1px solid #ddd;
-    }
-
-    .content-inputs {
-        display: block;
-    }
-}
-</style>
+<style scoped></style>

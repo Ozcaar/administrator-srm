@@ -17,31 +17,36 @@ import Swal from 'sweetalert2'
                         @input="searchByInput()" />
 
                     <button class="btn" @click="openModal(newData())">🧑‍💼 Agregar usuario</button>
-                    <button class="btn btn-toggle" @click="togglePassword()">🙂 Mostrar contraseña</button>
-                    <button class="btn"><strong>❔</strong></button>
+                    <button class="btn btn-toggle-password" @click="togglePassword()">🔓 Mostrar contraseña</button>
+                    <button class="btn btn-toggle-inactive" @click="toggleInactive()">🙂 Mostrar inactivos</button>
+                    <!-- <button class="btn"><strong>❔</strong></button> -->
                 </div>
 
                 <div class="table-container" @click="handleClick">
+                    <div class="spinner-table" ref="spinnerTable" style="display: flex;">
+                        <div class="spinner"></div>
+                    </div>
                     <table id="table">
                         <thead>
                             <tr class="table-header">
                                 <th @click="ordenarTabla(0)" class="text-center">Usuario</th>
-                                <th @click="ordenarTabla(1)">Nombre</th>
-                                <th @click="ordenarTabla(2)">Contraseña</th>
-                                <th @click="ordenarTabla(3)" class="text-center">Activo</th>
-                                <th @click="ordenarTabla(4)" class="text-center">PC</th>
-                                <th @click="ordenarTabla(5)">Comentarios</th>
+                                <th @click="ordenarTabla(1)" class="cell-md">Nombre</th>
+                                <th @click="ordenarTabla(2)" class="cell-md">Contraseña</th>
+                                <th @click="ordenarTabla(3)" class="text-center cell-sm">Activo</th>
+                                <th @click="ordenarTabla(4)" class="text-center cell-md">PC</th>
+                                <th @click="ordenarTabla(5)" class="cell-lg">Comentarios</th>
                             </tr>
                         </thead>
                         <tbody class="table-body">
                             <tr v-for="user in users" :key="user.id" :id="`${user.id}`" class="user-row"
-                                @click="openModal(user)">
-                                <td class="text-center">{{ user.user }}</td>
-                                <td>{{ user.name }}</td>
-                                <td class="password password-hidden">{{ user.password }}</td>
-                                <td class="text-center">{{ user.active ? 'Si' : 'No' }}</td>
-                                <td class="text-center">{{ findComputer(user.id_computer)['name'] }}</td>
-                                <td>{{ user.comment }}</td>
+                                :class="{ 'inactive user-hidden': !user.active }" @click="openModal(user)">
+                                <td class="text-center cell-md">{{ user.user }}</td>
+                                <td class="cell-md">{{ user.name }}</td>
+                                <td class="password password-hidden cell-md">{{ user.password }}</td>
+                                <td class="text-center cell-sm">{{
+                            user.active ? 'Si' : 'No' }}</td>
+                                <td class="text-center cell-md">{{ findComputer(user.id_computer)['name'] }}</td>
+                                <td class="cell-lg">{{ user.comment }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -59,12 +64,19 @@ export default {
             url: 'http://10.21.11.156:8080',
             // url: 'http://localhost:8080',
             // url: 'http://192.168.1.15:8080',
+            urlWithParams: '',
+            urlWithParamsComputers: '',
+            params: {
+                username: sessionStorage.getItem('srm-admin-user'),
+                token: sessionStorage.getItem('srm-admin-token')
+            },
             tempIdComputer: 0,
             tempUser: {},
             users: [],
             auxUsers: [],
             computers: [],
             passwordHidden: true,
+            inactiveHidden: true,
             originalPasswords: {},
             modalData: {
                 id: '',
@@ -87,31 +99,39 @@ export default {
         }
     },
     mounted() {
-        this.fetchUsers()
+        this.urlWithParams = new URL(this.url + '/users');
+        this.urlWithParams.search = new URLSearchParams(this.params).toString();
+
+        this.urlWithParamsComputers = new URL(this.url + '/computers');
+        this.urlWithParamsComputers.search = new URLSearchParams(this.params).toString();
+        this.fetchUsers();
     },
     methods: {
+
         async fetchUsers() {
             try {
-                const response = await fetch(this.url + '/users');
+                const response = await fetch(this.urlWithParams);
                 const data = await response.json();
                 this.users = data;
                 this.auxUsers = data;
                 document.getElementById("input-search").value = '';
+                this.$refs.spinnerTable.style.display = 'none';
             } catch (error) {
                 console.error('Error al obtener usuarios:', error)
             }
 
             try {
-                const response = await fetch(this.url + '/computers');
+                const response = await fetch(this.urlWithParamsComputers);
                 const data = await response.json();
                 this.computers = data;
             } catch (error) {
                 console.error('Error al obtener computadoras:', error);
             }
+
         },
         async updateUser() {
             try {
-                const usersResponse = await fetch(this.url + '/users', {
+                const usersResponse = await fetch(this.urlWithParams, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -155,7 +175,7 @@ export default {
             return user != undefined ? user : null;
         },
         async updateComputer() {
-            const computersResponse = await fetch(this.url + '/computers', {
+            const computersResponse = await fetch(this.urlWithParamsComputers, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -308,7 +328,6 @@ export default {
                 html: this.modalHTML(),
                 preConfirm: async () => {
                     if (
-                        document.getElementById('swal-input5').value.trim() != '' &&
                         document.getElementById('swal-input5').value.trim() != null
                     ) {
                         // VERIFICAR SI LA PC DADA YA EXISTE
@@ -348,12 +367,13 @@ export default {
                         id_computer: this.computerData['id'], // id_computer
                         comment: document.getElementById('swal-input6').value // comment
                     }
+                    console.log(this.modalData);
                 }
             }).then((result) => {
                 // CONSTANTES NECESARIAS PARA LA VALIDACIÓN
                 const sameUser = this.tempUser === this.modalData.user;
                 const userExists = this.findUser(this.modalData.user).length > 0 ? true : false;
-                const computerIdNotFound = this.findUserComputerId(this.computerData.id) === null;
+                const computerIdNotFound = document.getElementById('swal-input5').value.trim() == '' ? true : (this.findUserComputerId(this.computerData.id) === null);
                 const sameIdOrNoComputerId =
                     this.tempIdComputer === this.modalData.id_computer || this.modalData.id_computer === null;
                 const fieldsRequired =
@@ -423,27 +443,49 @@ export default {
             }
         },
         togglePassword() {
-            const toggleButton = document.querySelector('.btn-toggle')
+            const toggleButton = document.querySelector('.btn-toggle-password')
 
             document.querySelectorAll('.password').forEach((cell) => {
                 if (this.passwordHidden) {
                     cell.classList.remove('password-hidden');
-                    toggleButton.textContent = '😌 Ocultar contraseñas';
+                    toggleButton.textContent = '🔒 Ocultar contraseñas';
                 } else {
                     cell.classList.add('password-hidden');
-                    toggleButton.textContent = '🙂 Mostrar contraseñas';
+                    toggleButton.textContent = '🔓 Mostrar contraseñas';
                 }
             })
             this.passwordHidden = !this.passwordHidden
         },
+        toggleInactive() {
+            const toggleButton = document.querySelector('.btn-toggle-inactive')
+
+            document.querySelectorAll('.user-row').forEach((row) => {
+                if (row.classList.contains('inactive')) {
+                    if (this.inactiveHidden) {
+                        row.classList.remove('user-hidden');
+                        toggleButton.textContent = '😌 Ocultar inactivos';
+                    } else {
+                        row.classList.add('user-hidden');
+                        toggleButton.textContent = '🙂 Mostrar inactivos';
+                    }
+                }
+            })
+            this.inactiveHidden = !this.inactiveHidden
+        },
         searchByInput() {
-            const inputSearch = document.getElementById("input-search").value;
+            const inputSearch = this.removeAccents(document.getElementById("input-search").value.toLowerCase());
 
             if (inputSearch !== '') {
-                this.users = this.auxUsers.filter(u => u.name.includes(inputSearch))
+                this.users = this.auxUsers.filter(u => {
+                    const nameWithoutAccents = this.removeAccents(u.name.toLowerCase());
+                    return nameWithoutAccents.includes(inputSearch);
+                });
             } else {
                 this.users = this.auxUsers;
             }
+        },
+        removeAccents(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         },
         ordenarTabla(n) {
             var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
@@ -487,132 +529,4 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Estilos generales */
-
-.text-center {
-    text-align: center;
-}
-
-.container {
-    width: 100%;
-    overflow: hidden;
-}
-
-.header {
-    height: 60px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    background-color: #f5f5f5;
-    font-family: system-ui, sans-serif;
-    font-weight: bolder;
-    padding: 0 0 0 20px;
-    border-bottom: 1px solid #e4e4e7;
-    /* Se reemplazó por la propiedad border-bottom */
-}
-
-.password-hidden {
-    -webkit-text-security: disc !important;
-}
-
-/* Estilos de contenido */
-.content {
-    padding: 30px;
-    height: calc(100% - 60px);
-    display: flex;
-    flex-direction: column;
-    background-image: url(../../public/imgs/dot-grid.png);
-}
-
-.content-inputs {
-    display: flex;
-}
-
-.input-search,
-.btn {
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 20px;
-    font-size: 15px;
-    color: #6b7280;
-    border: #e4e4e7 1px solid;
-    height: 50px;
-    margin-right: 5px;
-    min-width: 50px;
-}
-
-/* Estilos de botones */
-.btn:hover {
-    cursor: pointer;
-    color: var(--dark);
-    background-color: var(--btn-selected);
-}
-
-/* Estilos de tablas */
-.table-header th {
-    font-weight: bold;
-}
-
-.table-container {
-    overflow: scroll;
-    flex-grow: 1;
-    background-color: white;
-    border: 1px solid #ddd;
-
-}
-
-table {
-    font-family: Arial, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-    user-select: none;
-}
-
-th,
-td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    cursor: pointer;
-}
-
-tbody>tr:hover {
-    cursor: pointer;
-    background-color: var(--btn-selected);
-}
-
-/* Estilos responsivos */
-@media screen and (max-width: 768px) {
-    .input-search {
-        width: 100%;
-    }
-
-    .btn {
-        border-radius: 10px;
-        padding: 10px;
-        margin-bottom: 20px;
-        font-size: 13px;
-        color: #6b7280;
-        border: #e4e4e7 1px solid;
-        height: 50px;
-        margin-right: 5px;
-        min-width: 50px;
-    }
-
-    .content {
-        padding: 15px;
-    }
-
-    .table-container {
-        border: 1px solid #ddd;
-    }
-
-    .content-inputs {
-        display: block;
-    }
-}
-</style>
+<style scoped></style>

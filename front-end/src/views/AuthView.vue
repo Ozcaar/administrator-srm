@@ -6,24 +6,27 @@
 
 <template>
 
+    <div class="spinner-overlay" ref="spinner" style="display: none;">
+        <div class="spinner"></div>
+    </div>
     <div class="container">
 
         <div class="form-wrap">
             <h1 class="title">PANEL SRM</h1>
 
-            <form class="form" action="" method="POST">
+            <form class="form" @submit.prevent="login">
                 <div>
-                    <label for="user" class="label">Usuario</label> <span class="invalid-data invalid-user">*</span>
+                    <label for="user" class="label">Usuario</label>
                     <input type="text" id="user" name="user" placeholder="usuario" class="input-text">
                 </div>
 
                 <div>
-                    <label for="password" class="label">Contraseña</label> <span
-                        class="invalid-data invalid-password">*</span>
+                    <label for="password" class="label">Contraseña</label>
                     <input type="password" id="password" name="password" placeholder="password" class="input-text">
                 </div>
 
-                <span class="invalid-data">Datos incorrectos</span>
+                <span ref="wrongData" class="wrong-data hidden-wrong-data">Datos
+                    incorrectos</span>
 
                 <button type="submit" class="btn-submit">Login</button>
                 <!-- <RouterLink class="btn" to="/panel">Regresar</RouterLink> -->
@@ -33,6 +36,51 @@
     </div>
 
 </template>
+
+<script>
+export default {
+    data() {
+        return {
+            url: 'http://10.21.11.156:8080'
+        };
+    },
+    mounted() {
+        sessionStorage.clear();
+        this.$refs.wrongData.classList.add('hidden-wrong-data');
+    },
+    methods: {
+        async login() {
+            try {
+                const userValue = document.getElementById('user').value;
+                const passwordValue = document.getElementById('password').value;
+
+                const queryString = new URLSearchParams();
+                queryString.append('username', userValue);
+                queryString.append('password', passwordValue);
+
+                const response = await fetch(`${this.url}/auth?${queryString.toString()}`);
+                const authToken = await response.text();
+
+                if (response.ok) {
+                    // Successful login
+                    this.$refs.spinner.style.display = 'flex';
+                    setTimeout(() => {
+                        sessionStorage.setItem('srm-admin-user', userValue);
+                        sessionStorage.setItem('srm-admin-token', authToken);
+                        this.$router.push('/panel');
+                    }, 1000);
+
+                } else {
+                    // Failed login
+                    document.querySelector('.wrong-data').classList.remove('hidden-wrong-data');
+                }
+            } catch (error) {
+                console.error('Error al realizar la solicitud:', error);
+            }
+        }
+    }
+}
+</script>
 
 <style scoped>
 .container {
@@ -62,7 +110,8 @@
 
 .form {
     display: flex;
-    height: 220px;
+    min-height: 220px;
+    max-height: 280px;
     flex-direction: column;
     justify-content: space-between;
 }
@@ -79,9 +128,15 @@
     margin-top: 10px;
 }
 
-.invalid-data {
+.wrong-data {
     color: rgb(207, 13, 13);
     font-size: 15px;
+}
+
+.hidden-wrong-data {
+    /* display: none; */
+    color: transparent;
+    user-select: none;
 }
 
 .btn-submit {
@@ -91,5 +146,11 @@
     border-radius: 5px;
     background-color: #18181b;
     color: white;
+    border: 5px solid rgb(255, 255, 255);
+}
+
+.btn-submit:hover {
+    border: 5px solid rgb(199, 199, 199);
+    cursor: pointer;
 }
 </style>

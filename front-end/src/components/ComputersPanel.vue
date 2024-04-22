@@ -16,10 +16,14 @@ import Swal from 'sweetalert2'
                         @input="searchByInput()" />
 
                     <button class="btn" @click="openModal(newData())">🖥️ Agregar computadora</button>
-                    <button class="btn"><strong>❔</strong></button>
+                    <button class="btn btn-toggle-inactive" @click="toggleInactive()">🙂 Mostrar inactivas</button>
+                    <!-- <button class="btn"><strong>❔</strong></button> -->
                 </div>
 
                 <div class="table-container" @click="handleClick">
+                    <div class="spinner-table" ref="spinnerTable" style="display: flex;">
+                        <div class="spinner"></div>
+                    </div>
                     <table id="table">
                         <thead>
                             <tr class="table-header">
@@ -32,7 +36,8 @@ import Swal from 'sweetalert2'
                             </tr>
                         </thead>
                         <tbody class="table-body">
-                            <tr v-for="computer in computers" :key="computer.id" :id="`${computer.id}`" class="user-row"
+                            <tr v-for="computer in computers" :key="computer.id" :id="`${computer.id}`"
+                                class="computer-row" :class="{ 'inactive computer-hidden': !computer.active }"
                                 @click="openModal(computer)">
                                 <td class="text-center">{{ computer.name }}</td>
                                 <td class="text-center">{{ computer.active ? 'Si' : 'No' }}</td>
@@ -57,11 +62,16 @@ export default {
             url: 'http://10.21.11.156:8080',
             // url: 'http://localhost:8080',
             // url: 'http://192.168.1.15:8080',
+            urlWithParams: '',
+            params: {
+                username: sessionStorage.getItem('srm-admin-user'),
+                token: sessionStorage.getItem('srm-admin-token')
+            },
             tempComputer: {},
             // users: [],
             auxComputers: [],
             computers: [],
-            passwordHidden: true,
+            inactiveHidden: true,
             originalPasswords: {},
             modalData: {
                 id: '',
@@ -75,23 +85,26 @@ export default {
         }
     },
     mounted() {
-        this.fetchComputers()
+        this.urlWithParams = new URL(this.url + '/computers');
+        this.urlWithParams.search = new URLSearchParams(this.params).toString();
+        this.fetchComputers();
     },
     methods: {
         async fetchComputers() {
             try {
-                const response = await fetch(this.url + '/computers');
+                const response = await fetch(this.urlWithParams);
                 const data = await response.json();
                 this.computers = data;
                 this.auxComputers = data;
                 document.getElementById("input-search").value = '';
+                this.$refs.spinnerTable.style.display = 'none';
             } catch (error) {
                 console.error('Error al obtener usuarios:', error)
             }
         },
         async updateComputer() {
             try {
-                const usersResponse = await fetch(this.url + '/computers', {
+                const usersResponse = await fetch(this.urlWithParams, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -323,28 +336,36 @@ export default {
                 comment: ''
             }
         },
-        togglePassword() {
-            const toggleButton = document.querySelector('.btn-toggle')
+        toggleInactive() {
+            const toggleButton = document.querySelector('.btn-toggle-inactive')
 
-            document.querySelectorAll('.password').forEach((cell) => {
-                if (this.passwordHidden) {
-                    cell.classList.remove('password-hidden');
-                    toggleButton.textContent = '😌 Ocultar contraseñas';
-                } else {
-                    cell.classList.add('password-hidden');
-                    toggleButton.textContent = '🙂 Mostrar contraseñas';
+            document.querySelectorAll('.computer-row').forEach((row) => {
+                if (row.classList.contains('inactive')) {
+                    if (this.inactiveHidden) {
+                        row.classList.remove('computer-hidden');
+                        toggleButton.textContent = '😌 Ocultar inactivas';
+                    } else {
+                        row.classList.add('computer-hidden');
+                        toggleButton.textContent = '🙂 Mostrar inactivas';
+                    }
                 }
             })
-            this.passwordHidden = !this.passwordHidden
+            this.inactiveHidden = !this.inactiveHidden
         },
         searchByInput() {
-            const inputSearch = document.getElementById("input-search").value;
+            const inputSearch = this.removeAccents(document.getElementById("input-search").value.toLowerCase());
 
             if (inputSearch !== '') {
-                this.computers = this.auxComputers.filter(c => c.name.includes(inputSearch))
+                this.computers = this.auxComputers.filter(c => {
+                    const nameWithoutAccents = this.removeAccents(c.name.toLowerCase());
+                    return nameWithoutAccents.includes(inputSearch);
+                });
             } else {
                 this.computers = this.auxComputers;
             }
+        },
+        removeAccents(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         },
         ordenarTabla(n) {
             var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
@@ -388,127 +409,4 @@ export default {
 }
 </script>
 
-<style scoped>
-/* GENERAL STYLES */
-.text-center {
-    text-align: center;
-}
-
-.container {
-    width: 100%;
-    overflow: hidden;
-}
-
-.header {
-    height: 60px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    background-color: #f5f5f5;
-    font-family: system-ui, sans-serif;
-    font-weight: bolder;
-    padding: 0 0 0 20px;
-    border-bottom: 1px solid #e4e4e7;
-}
-
-.password-hidden {
-    -webkit-text-security: disc !important;
-}
-
-/* CONTENT STYLES */
-.content {
-    padding: 30px;
-    height: calc(100% - 60px);
-    display: flex;
-    flex-direction: column;
-}
-
-.content-inputs {
-    display: flex;
-}
-
-.input-search,
-.btn {
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 20px;
-    font-size: 15px;
-    color: #6b7280;
-    border: #e4e4e7 1px solid;
-    height: 50px;
-    margin-right: 5px;
-    min-width: 50px;
-}
-
-/* BUTTON STYLES */
-.btn:hover {
-    cursor: pointer;
-    color: var(--dark);
-    background-color: var(--btn-selected);
-}
-
-/* TABLE STYLES */
-.table-header th {
-    font-weight: bold;
-}
-
-.table-container {
-    overflow: scroll;
-    flex-grow: 1;
-}
-
-table {
-    font-family: Arial, sans-serif;
-    border-collapse: collapse;
-    border-radius: 10px;
-    width: 100%;
-    user-select: none;
-}
-
-th,
-td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    cursor: pointer;
-}
-
-tbody>tr:hover {
-    cursor: pointer;
-    background-color: var(--btn-selected);
-}
-
-/* RESPONSIVE STYLES */
-@media screen and (max-width: 768px) {
-    .input-search {
-        width: 100%;
-    }
-
-    .btn {
-        border-radius: 10px;
-        padding: 10px;
-        margin-bottom: 20px;
-        font-size: 13px;
-        color: #6b7280;
-        border: #e4e4e7 1px solid;
-        height: 50px;
-        margin-right: 5px;
-        min-width: 50px;
-    }
-
-    .content {
-        padding: 15px;
-    }
-
-    .table-container {
-        border: 1px solid #ddd;
-    }
-
-    .content-inputs {
-        display: block;
-    }
-}
-</style>
+<style scoped></style>

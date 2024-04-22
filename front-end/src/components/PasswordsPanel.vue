@@ -15,12 +15,15 @@ import Swal from 'sweetalert2'
                     <input id="input-search" class="input-search" type="text" placeholder="🔍 Búsqueda por servicio"
                         @input="searchByInput()" />
 
-                    <button class="btn" @click="openModal(newData())">🔐 Agregar servicio</button>
-                    <button class="btn btn-toggle" @click="togglePassword()">🙂 Mostrar contraseñas</button>
-                    <button class="btn"><strong>❔</strong></button>
+                    <button class="btn" @click="openModal(newData())">🗝️ Agregar servicio</button>
+                    <button class="btn btn-toggle" @click="togglePassword()">🔓 Mostrar contraseñas</button>
+                    <!-- <button class="btn"><strong>❔</strong></button> -->
                 </div>
 
                 <div class="table-container" @click="handleClick">
+                    <div class="spinner-table" ref="spinnerTable" style="display: flex;">
+                        <div class="spinner"></div>
+                    </div>
                     <table id="table">
                         <thead>
                             <tr class="table-header">
@@ -38,7 +41,7 @@ import Swal from 'sweetalert2'
                                 <td class="password password-hidden">{{ service.password }}</td>
                                 <td><a :href="`${validLink(service.access_link)}`" target="_blank">{{
                             service.access_link
-                        }}</a></td>
+                                        }}</a></td>
                             </tr>
                         </tbody>
                     </table>
@@ -56,6 +59,11 @@ export default {
             url: 'http://10.21.11.156:8080',
             // url: 'http://localhost:8080',
             // url: 'http://192.168.1.15:8080',
+            urlWithParams: '',
+            params: {
+                username: sessionStorage.getItem('srm-admin-user'),
+                token: sessionStorage.getItem('srm-admin-token')
+            },
             tempService: {},
             // users: [],
             auxServices: [],
@@ -72,23 +80,26 @@ export default {
         }
     },
     mounted() {
-        this.fetchServices()
+        this.urlWithParams = new URL(this.url + '/services');
+        this.urlWithParams.search = new URLSearchParams(this.params).toString();
+        this.fetchServices();
     },
     methods: {
         async fetchServices() {
             try {
-                const response = await fetch(this.url + '/services');
+                const response = await fetch(this.urlWithParams);
                 const data = await response.json();
                 this.services = data;
                 this.auxServices = data;
                 document.getElementById("input-search").value = '';
+                this.$refs.spinnerTable.style.display = 'none';
             } catch (error) {
                 console.error('Error al obtener las cuentas:', error)
             }
         },
         async updateService() {
             try {
-                const usersResponse = await fetch(this.url + '/services', {
+                const usersResponse = await fetch(this.urlWithParams, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -329,22 +340,28 @@ export default {
             document.querySelectorAll('.password').forEach((cell) => {
                 if (this.passwordHidden) {
                     cell.classList.remove('password-hidden');
-                    toggleButton.textContent = '😌 Ocultar contraseñas';
+                    toggleButton.textContent = '🔒 Ocultar contraseñas';
                 } else {
                     cell.classList.add('password-hidden');
-                    toggleButton.textContent = '🙂 Mostrar contraseñas';
+                    toggleButton.textContent = '🔓 Mostrar contraseñas';
                 }
             })
             this.passwordHidden = !this.passwordHidden
         },
         searchByInput() {
-            const inputSearch = document.getElementById("input-search").value;
+            const inputSearch = this.removeAccents(document.getElementById("input-search").value.toLowerCase());
 
             if (inputSearch !== '') {
-                this.services = this.auxServices.filter(s => s.service.includes(inputSearch))
+                this.services = this.auxServices.filter(s => {
+                    const nameWithoutAccents = this.removeAccents(s.service.toLowerCase());
+                    return nameWithoutAccents.includes(inputSearch);
+                });
             } else {
                 this.services = this.auxServices;
             }
+        },
+        removeAccents(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         },
         ordenarTabla(n) {
             var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
@@ -398,127 +415,4 @@ export default {
 }
 </script>
 
-<style scoped>
-/* GENERAL STYLES */
-.text-center {
-    text-align: center;
-}
-
-.container {
-    width: 100%;
-    overflow: hidden;
-}
-
-.header {
-    height: 60px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    background-color: #f5f5f5;
-    font-family: system-ui, sans-serif;
-    font-weight: bolder;
-    padding: 0 0 0 20px;
-    border-bottom: 1px solid #e4e4e7;
-}
-
-.password-hidden {
-    -webkit-text-security: disc !important;
-}
-
-/* CONTENT STYLES */
-.content {
-    padding: 30px;
-    height: calc(100% - 60px);
-    display: flex;
-    flex-direction: column;
-}
-
-.content-inputs {
-    display: flex;
-}
-
-.input-search,
-.btn {
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 20px;
-    font-size: 15px;
-    color: #6b7280;
-    border: #e4e4e7 1px solid;
-    height: 50px;
-    margin-right: 5px;
-    min-width: 50px;
-}
-
-/* BUTTON STYLES */
-.btn:hover {
-    cursor: pointer;
-    color: var(--dark);
-    background-color: var(--btn-selected);
-}
-
-/* TABLE STYLES */
-.table-header th {
-    font-weight: bold;
-}
-
-.table-container {
-    overflow: scroll;
-    flex-grow: 1;
-}
-
-table {
-    font-family: Arial, sans-serif;
-    border-collapse: collapse;
-    border-radius: 10px;
-    width: 100%;
-    user-select: none;
-}
-
-th,
-td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    cursor: pointer;
-}
-
-tbody>tr:hover {
-    cursor: pointer;
-    background-color: var(--btn-selected);
-}
-
-/* RESPONSIVE STYLES */
-@media screen and (max-width: 768px) {
-    .input-search {
-        width: 100%;
-    }
-
-    .btn {
-        border-radius: 10px;
-        padding: 10px;
-        margin-bottom: 20px;
-        font-size: 13px;
-        color: #6b7280;
-        border: #e4e4e7 1px solid;
-        height: 50px;
-        margin-right: 5px;
-        min-width: 50px;
-    }
-
-    .content {
-        padding: 15px;
-    }
-
-    .table-container {
-        border: 1px solid #ddd;
-    }
-
-    .content-inputs {
-        display: block;
-    }
-}
-</style>
+<style scoped></style>
