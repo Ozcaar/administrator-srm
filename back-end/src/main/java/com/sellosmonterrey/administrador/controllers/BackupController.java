@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.sellosmonterrey.administrador.BackupUtils;
@@ -21,6 +20,7 @@ import com.sellosmonterrey.administrador.models.ComputerModel;
 import com.sellosmonterrey.administrador.models.MailModel;
 import com.sellosmonterrey.administrador.models.ServiceModel;
 import com.sellosmonterrey.administrador.repositories.UserRepository;
+import com.sellosmonterrey.administrador.services.AuthService;
 import com.sellosmonterrey.administrador.repositories.AdminRepository;
 import com.sellosmonterrey.administrador.repositories.ComputerRepository;
 import com.sellosmonterrey.administrador.repositories.MailRepository;
@@ -46,8 +46,19 @@ public class BackupController {
     @Autowired
     private ServiceRepository serviceRepository;
 
+    @Autowired
+    private AuthService authService;
+
+    String fileName = "backup_" + BackupUtils.getCurrentDateString() + ".csv";
+    String filePath = "Z:\\Sistemas\\backups\\" + fileName;
+
     @GetMapping
-    public ResponseEntity<String> createBackup() throws IOException {
+    public ResponseEntity<String> createBackup(@RequestParam("username") String username,
+            @RequestParam("token") String token) throws IOException {
+
+        if (!authService.authCurrentSession(username, token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         List<AdminModel> admins = (List<AdminModel>) adminRepository.findAll();
         List<UserModel> users = (List<UserModel>) userRepository.findAll();
@@ -61,20 +72,21 @@ public class BackupController {
             backupDir.mkdirs();
         }
 
-        String currentDateString = BackupUtils.getCurrentDateString();
-        String filePath = backupDirPath + "/" + currentDateString + ".csv";
+        // String currentDateString = BackupUtils.getCurrentDateString();
+        // String filePath = backupDirPath + "/" + currentDateString + ".csv";
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
 
             // Write header admins
             writer.write("ADMINISTRADORES");
             writer.newLine();
-            writer.write("id,passwordHashed,salt");
+            writer.write("id,username,password,salt,token,last_login");
             writer.newLine();
 
             // Write admins
             for (AdminModel admin : admins) {
-                writer.write(admin.getId() + "," + admin.getPassword() + "," + admin.getSalt());
+                writer.write(admin.getId() + "," + admin.getUsername() + "," + admin.getPassword() + ","
+                        + admin.getSalt() + "," + admin.getToken() + "," + admin.getLast_login());
                 writer.newLine();
             }
             writer.newLine();
@@ -146,12 +158,17 @@ public class BackupController {
     }
 
     @GetMapping("/downloadBackup")
-    public ResponseEntity<FileSystemResource> downloadBackup() throws IOException {
-        String filePath = BackupUtils.getBackupDirPath() + "/" + BackupUtils.getCurrentDateString() + ".csv";
+    public ResponseEntity<FileSystemResource> downloadBackup(@RequestParam("username") String username,
+            @RequestParam("token") String token) throws IOException {
+
+        if (!authService.authCurrentSession(username, token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         FileSystemResource resource = new FileSystemResource(filePath);
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.valueOf("application/octet-stream"))
-                .header("Content-Disposition", "attachment; filename=\"" + resource.getFilename() + "\"")
+                .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
                 .body(resource);
     }
 }
