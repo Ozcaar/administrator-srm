@@ -1,20 +1,16 @@
 package com.sellosmonterrey.administrador.controllers;
 
-import java.util.Optional;
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sellosmonterrey.administrador.models.AdminModel;
-import com.sellosmonterrey.administrador.repositories.AdminRepository;
+import com.sellosmonterrey.administrador.services.AuthService;
 
 @RestController
 @RequestMapping("/auth")
@@ -22,42 +18,26 @@ import com.sellosmonterrey.administrador.repositories.AdminRepository;
 public class AuthController {
 
     @Autowired
-    private AdminRepository adminRepository;
+    AuthService authService;
 
     @GetMapping
     public ResponseEntity<String> login(@RequestParam("username") String username,
             @RequestParam("password") String password) {
 
-        // Find by username
-        Optional<AdminModel> adminOptional = adminRepository.findByUsername(username);
-
-        if (adminOptional.isPresent()) {
-            AdminModel admin = adminOptional.get();
-
-            // Verify password
-            if (verifyPassword(admin.getSalt() + password, admin.getPassword())) {
-                String token = generateToken(); // Generate random token
-                admin.setToken(token); // Update the token in the admin's table of db
-                adminRepository.save(admin);
-                return ResponseEntity.ok(token); // Return token as response
-            }
+        try {
+            String token = authService.authenticate(username, password);
+            return ResponseEntity.ok(token);
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        // If invalid return unauthorized
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    private boolean verifyPassword(String saltedPassword, String hashedPassword) {
-
-        // Prepare encoder
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-        // Verify if both password matches
-        return passwordEncoder.matches(saltedPassword, hashedPassword);
+    @GetMapping(path = "/current")
+    public ResponseEntity<String> currentSession(@RequestParam("username") String username) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(authService.getCurrentToken(username));
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
-
-    private String generateToken() {
-        // Generate a session token
-        return UUID.randomUUID().toString();
-    }
-
 }
