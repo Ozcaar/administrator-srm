@@ -31,9 +31,13 @@ public class AdminService {
         return adminRepository.findById(id);
     }
 
+    public Optional<AdminModel> getAdminByUsername(String username) {
+        return adminRepository.findByUsername(username);
+    }
+
     // POST
 
-    public AdminModel savAdminModel(AdminModel admin) {
+    public AdminModel saveAdminModel(AdminModel admin) {
         return adminRepository.save(admin);
     }
 

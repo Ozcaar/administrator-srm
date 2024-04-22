@@ -78,7 +78,7 @@ public class AdminController {
         admin.setPassword(hashedPassword);
 
         // Save AdminModel instance
-        return this.adminService.savAdminModel(admin);
+        return this.adminService.saveAdminModel(admin);
     }
 
     // Save many admins

@@ -1,5 +1,7 @@
 package com.sellosmonterrey.administrador.models;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -22,6 +24,17 @@ public class AdminModel {
 
     @Column(nullable = true)
     private String token;
+
+    @Column(nullable = true)
+    private LocalDate last_login;
+
+    public LocalDate getLast_login() {
+        return last_login;
+    }
+
+    public void setLast_login(LocalDate last_login) {
+        this.last_login = last_login;
+    }
 
     public Long getId() {
         return id;
