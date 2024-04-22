@@ -39,7 +39,7 @@ public class MailService {
 
     // DELETE
 
-    public boolean deleteUser(Long id) {
+    public boolean deleteMail(Long id) {
         try {
             mailRepository.deleteById(id);
             return true;
