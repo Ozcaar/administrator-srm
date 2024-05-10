@@ -90,7 +90,7 @@ import Swal from 'sweetalert2'
 export default {
     data() {
         return {
-            url: 'http://10.21.11.156:8080',
+            url: 'http://' + window.location.hostname + ':8090',
             urlWithParamsBackup: '',
             urlWithParamsDownloadBackup: '',
             currentAut: '',
@@ -102,6 +102,7 @@ export default {
         }
     },
     mounted() {
+        // this.url = window.location.hostname + ':8090';
         this.urlWithParamsBackup = new URL(this.url + '/admin/backup');
         this.urlWithParamsBackup.search = new URLSearchParams(this.params).toString();
 

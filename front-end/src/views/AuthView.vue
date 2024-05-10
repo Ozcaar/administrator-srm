@@ -41,16 +41,21 @@
 export default {
     data() {
         return {
-            url: 'http://10.21.11.156:8080'
+            url: 'http://' + window.location.hostname + ':8090',
         };
     },
     mounted() {
+        //this.url = window.location.hostname + ':8090';
         sessionStorage.clear();
         this.$refs.wrongData.classList.add('hidden-wrong-data');
     },
     methods: {
         async login() {
             try {
+                // Set spinner
+                this.$refs.spinner.style.display = 'flex';
+
+
                 const userValue = document.getElementById('user').value;
                 const passwordValue = document.getElementById('password').value;
 
@@ -59,21 +64,21 @@ export default {
                 queryString.append('password', passwordValue);
 
                 const response = await fetch(`${this.url}/auth?${queryString.toString()}`);
-                const authToken = await response.text();
-
-                if (response.ok) {
-                    // Successful login
-                    this.$refs.spinner.style.display = 'flex';
-                    setTimeout(() => {
-                        sessionStorage.setItem('srm-admin-user', userValue);
-                        sessionStorage.setItem('srm-admin-token', authToken);
-                        this.$router.push('/panel');
-                    }, 1000);
-
+                if (response.status === 200) {
+                    console.log(this.url);
+                    console.log(response);
+                    const authToken = await response.text();
+                    sessionStorage.setItem('srm-admin-user', userValue);
+                    sessionStorage.setItem('srm-admin-token', authToken);
+                    this.$router.push('/panel');
                 } else {
                     // Failed login
                     document.querySelector('.wrong-data').classList.remove('hidden-wrong-data');
                 }
+
+
+
+
             } catch (error) {
                 console.error('Error al realizar la solicitud:', error);
             }
