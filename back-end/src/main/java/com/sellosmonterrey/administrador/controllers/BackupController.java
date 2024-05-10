@@ -28,7 +28,8 @@ import com.sellosmonterrey.administrador.repositories.ServiceRepository;
 
 @RestController
 @RequestMapping("/admin/backup")
-@CrossOrigin(origins = { "http://localhost:5173", "http://10.21.11.156:5173", "http://192.168.1.15:5173" })
+// @CrossOrigin(origins = { "http://localhost:5173", "http://10.21.11.156:5173",
+// "http://192.168.1.15:5173" })
 public class BackupController {
 
     @Autowired
@@ -50,7 +51,7 @@ public class BackupController {
     private AuthService authService;
 
     String fileName = "backup_" + BackupUtils.getCurrentDateString() + ".csv";
-    String filePath = "Z:\\Sistemas\\backups\\" + fileName;
+    String filePath = "F:\\sellos\\Sistemas\\backups" + fileName;
 
     @GetMapping
     public ResponseEntity<String> createBackup(@RequestParam("username") String username,

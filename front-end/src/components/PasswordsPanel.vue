@@ -41,7 +41,7 @@ import Swal from 'sweetalert2'
                                 <td class="password password-hidden">{{ service.password }}</td>
                                 <td><a :href="`${validLink(service.access_link)}`" target="_blank">{{
                             service.access_link
-                                        }}</a></td>
+                        }}</a></td>
                             </tr>
                         </tbody>
                     </table>
@@ -56,9 +56,7 @@ import Swal from 'sweetalert2'
 export default {
     data() {
         return {
-            url: 'http://10.21.11.156:8080',
-            // url: 'http://localhost:8080',
-            // url: 'http://192.168.1.15:8080',
+            url: 'http://' + window.location.hostname + ':8090',
             urlWithParams: '',
             params: {
                 username: sessionStorage.getItem('srm-admin-user'),
@@ -80,6 +78,7 @@ export default {
         }
     },
     mounted() {
+        //this.url = window.location.hostname + ':8090';
         this.urlWithParams = new URL(this.url + '/services');
         this.urlWithParams.search = new URLSearchParams(this.params).toString();
         this.fetchServices();

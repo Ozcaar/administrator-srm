@@ -15,7 +15,7 @@ import Swal from 'sweetalert2'
                     <input id="input-search" class="input-search" type="text" placeholder="🔍 Búsqueda por usuario"
                         @input="searchByInput()" />
 
-                    <button class="btn" @click="openModal(newData())">👨‍✈️ Agregar usuario administrador</button>
+                    <button class="btn" @click="openModalNew(newData())">👨‍✈️ Agregar usuario administrador</button>
                     <!-- <button class="btn btn-toggle" @click="togglePassword()">🔓 Mostrar contraseñas</button> -->
                     <!-- <button class="btn"><strong>❔</strong></button> -->
                 </div>
@@ -33,14 +33,15 @@ import Swal from 'sweetalert2'
                         </thead>
                         <tbody class="table-body">
                             <!-- <tr v-for="admin in admins" :key="admin.id" :id="`${admin.id}`" @click="openModal(admin)"> -->
-                            <tr v-for="admin in admins" :key="admin.id" :id="`${admin.id}`" class="row-md">
+                            <tr v-for="admin in filteredAdmins" :key="admin.id" class="row-md">
                                 <td class="cell-md text-center">{{ admin.username }}</td>
-                                <td class="cell-md text-center">{{ admin.last_login }}</td>
+                                <td class="cell-md text-center">{{ lastLoginText(admin) }}</td>
                                 <td class="borderless">
                                     <div class="row-buttons-container">
                                         <button class="btn-admin btn-chpw" @click="changePassword(admin)"> Cambiar
                                             contraseña</button>
-                                        <button class="btn-admin btn-delete" @click="openModal(admin)">Eliminar</button>
+                                        <button class="btn-admin btn-delete"
+                                            @click="deleteAdmin(admin)">Eliminar</button>
                                     </div>
                                 </td>
                             </tr>
@@ -57,9 +58,7 @@ import Swal from 'sweetalert2'
 export default {
     data() {
         return {
-            url: 'http://10.21.11.156:8080',
-            // url: 'http://localhost:8080',
-            // url: 'http://192.168.1.15:8080',
+            url: 'http://' + window.location.hostname + ':8090',
             urlWithParams: '',
             params: {
                 username: sessionStorage.getItem('srm-admin-user'),
@@ -74,15 +73,23 @@ export default {
             modalData: {
                 id: '',
                 username: '',
+                password: '',
                 last_login: '',
             },
         }
     },
     mounted() {
+        // this.url = window.location.hostname + ':8090';
         this.urlWithParams = new URL(this.url + '/admins');
         this.urlWithParams.search = new URLSearchParams(this.params).toString();
         this.fetchAdmins();
     },
+    computed: {
+        filteredAdmins() {
+            return this.admins.filter(admin => admin.username !== 'admin');
+        }
+    },
+
     methods: {
         async fetchAdmins() {
             try {
@@ -95,6 +102,9 @@ export default {
             } catch (error) {
                 console.error('Error al obtener la lista de administradores:', error)
             }
+        },
+        lastLoginText(admin) {
+            return admin.last_login ? admin.last_login : "NUNCA";
         },
         async updateAdmin() {
             try {
@@ -125,9 +135,9 @@ export default {
                 });
             }
         },
-        async deleteAdmin() {
+        async deleteAdmin(admin) {
             try {
-                const deleteURL = new URL(this.url + '/admins' + '/' + this.modalData.id);
+                const deleteURL = new URL(this.url + '/admins' + '/' + admin.id);
                 deleteURL.search = new URLSearchParams(this.params).toString();
                 const adminsResponse = await fetch(deleteURL, {
                     method: 'DELETE',
@@ -156,8 +166,77 @@ export default {
                 });
             }
         },
-        modalChangePassword() {
+        changePassword(admin) {
+            this.modalData = {
+                id: admin.id,
+                username: admin.username,
+                password: admin.password,
+                last_login: admin.last_login,
+            }
 
+            // OPEN UPDATE MAIL MODAL
+            this.tempMail = {}
+            Swal.fire({
+                title: '',
+                showCancelButton: true,
+                //showDenyButton: this.modalData.id != '' ? true : false,
+                confirmButtonText: 'Modificar',
+                cancelButtonText: 'Cancelar',
+                html: this.modalHTMLAdd(),
+                preConfirm: async () => {
+                    // GET INPUT VALUES FROM MODAL AND SAVE IT
+                    this.modalData = {
+                        id: document.getElementById('swal-input0').value, // id
+                        //username: document.getElementById('swal-input1').value, // username
+                        username: this.modalData.username,
+                        password: document.getElementById('swal-input2').value, // password
+                        last_login: this.modalData.last_login,
+                    }
+                }
+            }).then((result) => {
+                // VALIDATION CONSTANTS
+                const fieldsRequired =
+                    this.modalData.id === null ||
+                    //this.modalData.username === null ||
+                    this.modalData.password === null ||
+                    this.modalData.password.toString().length < 4;
+
+                // DATA VALIDATION
+                if (result.isConfirmed) {
+                    try {
+                        if (fieldsRequired) {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'La contraseña es requerida (4 o más caractéres)',
+                                icon: 'warning'
+                            })
+                            return;
+                        }
+                        this.updateAdmin()
+                    } catch (error) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: '(1) Hay un error en la captura de los datos: ' + error,
+                            icon: 'warning'
+                        });
+                    }
+                }
+                // else if (result.isDenied) {
+                //     Swal.fire({
+                //         showConfirmButton: true,
+                //         showDenyButton: true,
+                //         confirmButtonText: 'Confirmar',
+                //         denyButtonText: 'Cancelar',
+                //         text: '¿Desea eliminar el correo ' + this.modalData.mail + ' ?',
+                //     }).then((res) => {
+                //         if (res.isConfirmed) {
+                //             this.deleteMail();
+                //         } else if (res.isDenied) {
+                //             Swal.fire("Cancelado", "", "info")
+                //         }
+                //     });
+                // };
+            })
         },
         findAdmin(admin_user) {
             const admin_user_list = this.admins.filter((a) => a.user === admin_user);
@@ -171,7 +250,92 @@ export default {
             const service = this.mails.find((u) => u.id_computer === id_service);
             return service != undefined ? service : null;
         },
-        modalHTML() {
+        modalHTMLAdd() {
+            return `
+                    <form class="form-container">
+                        <label style="display: none;">ID</label>
+                        <input style="display: none;" disabled value ="${this.modalData.id}" id="swal-input0" class="input input-text input-id" placeholder="[no modificable]" autocomplete="off">
+
+                        <label>Usuario</label>
+                        <input value ="${this.modalData.username ? this.modalData.username : ''}" id="swal-input1" class="input input-text" placeholder="Nombre del servicio" autocomplete="off" ${this.modalData.username ? 'disabled style="color: #757575;"' : ''}>
+
+                        <label>Nueva contraseña</label>
+                        <input value ="" id="swal-input2" class="input input-text" placeholder="Password" autocomplete="off">
+                    </form>   
+
+                    <style>
+                    .form-container {
+                            margin: 0 auto;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: start;
+                            text-align: left;
+                            padding: 30px 30px 0 30px;
+                            font-family: sans-serif;
+                            width: 400px;
+                            user-select: none;
+                        }
+
+                        .input-text, .input-textarea {
+                            all: initial;
+                        }
+
+                        .input {
+                            background-color: #f0f0f0;
+                            border-radius: 10px;
+                            padding: 10px;
+                            margin: 5px 0 25px 0;
+                            font-size: 15px;
+                            font-family: sans-serif;
+                            width: 90%;
+                        }
+
+                        .input-id {
+                            color: gray;
+                        }
+
+                        .password-container{
+                        }
+
+                        .password-field {
+                            margin-bottom: 20px
+                        }
+
+                        .show-hide-checkbox {
+                            /*background-color: transparent;*/
+                            padding: 30px;
+                            margin-bottom: 25px;
+                        }
+
+                        input[type="checkbox"] ~ span{
+                            margin-left: 10px;
+                        }
+
+                        .input-textarea {
+                            width: 90%;
+                            height: 50px;
+                            padding: 10px;
+                            font-size: 16px;
+                            font-family: sans-serif;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            resize: vertical;
+                            min-height: 50px;
+                            max-height: 200px;
+                        }
+
+                        .input-textarea:focus {
+                            border-color: #bdbdbd;
+                        }
+
+                        @media screen and (max-width: 768px) {
+                        .form-container {
+                            width: 100%;
+                        }
+                    </style>
+                    `
+        },
+        modalHTMLDelete() {
             return `
                     <form class="form-container">
                         <label style="display: none;">ID</label>
@@ -256,15 +420,83 @@ export default {
                     </style>
                     `
         },
+        openModalNew(admin) {
+            this.modalData = {
+                id: admin.id,
+                username: admin.username,
+                password: admin.password,
+            }
+
+            //this.tempMail = {}
+            Swal.fire({
+                title: '',
+                showCancelButton: true,
+                showDenyButton: this.modalData.id != '' ? true : false,
+                confirmButtonText: 'Agregar',
+                cancelButtonText: 'Cancelar',
+                html: this.modalHTMLAdd(),
+                preConfirm: async () => {
+                    // GET INPUT VALUES FROM MODAL AND SAVE IT
+                    this.modalData = {
+                        id: document.getElementById('swal-input0').value, // id
+                        username: document.getElementById('swal-input1').value, // username
+                        password: document.getElementById('swal-input2').value, // password
+                    }
+                }
+            }).then((result) => {
+                // VALIDATION CONSTANTS
+                const fieldsRequired =
+                    this.modalData.id === null ||
+                    //this.modalData.username === null ||
+                    this.modalData.password === null ||
+                    this.modalData.password.toString().length < 4;
+
+                // DATA VALIDATION
+                if (result.isConfirmed) {
+                    try {
+                        if (fieldsRequired) {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'La contraseña es requerida (4 o más caractéres)',
+                                icon: 'warning'
+                            })
+                            return;
+                        }
+                        this.updateAdmin()
+                    } catch (error) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: '(1) Hay un error en la captura de los datos: ' + error,
+                            icon: 'warning'
+                        });
+                    }
+                }
+                // else if (result.isDenied) {
+                //     Swal.fire({
+                //         showConfirmButton: true,
+                //         showDenyButton: true,
+                //         confirmButtonText: 'Confirmar',
+                //         denyButtonText: 'Cancelar',
+                //         text: '¿Desea eliminar el correo ' + this.modalData.mail + ' ?',
+                //     }).then((res) => {
+                //         if (res.isConfirmed) {
+                //             this.deleteMail();
+                //         } else if (res.isDenied) {
+                //             Swal.fire("Cancelado", "", "info")
+                //         }
+                //     });
+                // };
+            })
+        },
         openModal(admin) {
             this.modalData = {
                 id: admin.id,
                 username: admin.username,
-                last_login: admin.last_login
+                password: admin.password
             }
 
             // OPEN UPDATE MAIL MODAL
-            this.tempMail = {}
+            //this.tempMail = {}
             Swal.fire({
                 title: '',
                 showCancelButton: true,
@@ -344,11 +576,9 @@ export default {
 
             return {
                 id: '',
-                service: '',
-                user: '',
-                mail: '',
+                username: '',
                 password: '',
-                recovery_mail: '',
+                last_login: '',
             }
         },
         // togglePassword() {

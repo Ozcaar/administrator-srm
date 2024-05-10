@@ -59,9 +59,7 @@ import Swal from 'sweetalert2'
 export default {
     data() {
         return {
-            url: 'http://10.21.11.156:8080',
-            // url: 'http://localhost:8080',
-            // url: 'http://192.168.1.15:8080',
+            url: 'http://' + window.location.hostname + ':8090',
             urlWithParams: '',
             params: {
                 username: sessionStorage.getItem('srm-admin-user'),
@@ -85,6 +83,7 @@ export default {
         }
     },
     mounted() {
+        // this.url = window.location.hostname + ':8090';
         this.urlWithParams = new URL(this.url + '/computers');
         this.urlWithParams.search = new URLSearchParams(this.params).toString();
         this.fetchComputers();
