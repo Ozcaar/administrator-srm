@@ -17,7 +17,8 @@ import com.sellosmonterrey.administrador.services.MailService;
 
 @RestController
 @RequestMapping("/mails")
-@CrossOrigin(origins = { "http://localhost:5173", "http://10.21.11.156:5173", "http://192.168.1.15:5173" })
+// @CrossOrigin(origins = { "http://localhost:5173", "http://10.21.11.156:5173",
+// "http://192.168.1.15:5173" })
 public class MailController {
 
     @Autowired
