@@ -17,7 +17,7 @@ public class ServiceModel {
     private long id;
 
     private String service;
-    private String user;
+    private String app_user;
     private String password;
     private String access_link;
 
@@ -38,11 +38,11 @@ public class ServiceModel {
     }
 
     public String getUser() {
-        return user;
+        return app_user;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setUser(String app_user) {
+        this.app_user = app_user;
     }
 
     public String getPassword() {

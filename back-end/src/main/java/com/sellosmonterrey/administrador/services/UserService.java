@@ -29,8 +29,8 @@ public class UserService {
 
     // POST
 
-    public UserModel saveUserModel(UserModel user) {
-        return userRepository.save(user);
+    public UserModel saveUserModel(UserModel app_user) {
+        return userRepository.save(app_user);
     }
 
     public List<UserModel> saveUserModels(List<UserModel> users) {

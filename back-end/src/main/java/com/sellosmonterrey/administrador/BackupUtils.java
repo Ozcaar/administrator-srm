@@ -8,7 +8,9 @@ import java.util.Calendar;
 public class BackupUtils {
 
     public static String getBackupDirPath() {
-        String homeDir = System.getProperty("user.home");
+        String homeDir = System.getProperty("app_user.home");
+        System.out.println(homeDir);
+
         return homeDir + "/backups";
     }
 

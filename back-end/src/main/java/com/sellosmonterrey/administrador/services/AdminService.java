@@ -38,6 +38,28 @@ public class AdminService {
     // POST
 
     public AdminModel saveAdminModel(AdminModel admin) {
+
+        // Generate the salt
+        int saltLength = 16;
+        String salt = generateSalt(saltLength);
+
+        // Get password from AdminModel instance
+        String password = admin.getPassword();
+
+        // Combine salt and password
+        String saltedPassword = salt + password;
+
+        // Prepare encoder
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+        // Encode password
+        String hashedPassword = passwordEncoder.encode(saltedPassword);
+
+        // Set the salt and password hashed back to the AdminModel instance
+        admin.setSalt(salt);
+        admin.setPassword(hashedPassword);
+
+        // Save AdminModel instance
         return adminRepository.save(admin);
     }
 

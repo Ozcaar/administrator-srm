@@ -15,7 +15,7 @@ public class MailModel {
     private String Service;
 
     @Column(nullable = false)
-    private String user;
+    private String app_user;
 
     @Column(nullable = false)
     private String mail;
@@ -42,11 +42,11 @@ public class MailModel {
     }
 
     public String getUser() {
-        return user;
+        return app_user;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setUser(String app_user) {
+        this.app_user = app_user;
     }
 
     public String getMail() {

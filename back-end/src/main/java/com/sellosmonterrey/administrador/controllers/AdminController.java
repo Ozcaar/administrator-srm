@@ -46,7 +46,7 @@ public class AdminController {
         return adminService.getAdmins();
     }
 
-    // Get an user by id
+    // Get an app_user by id
     @GetMapping(path = "/{id}")
     public Optional<AdminModel> getAdmin(@PathVariable("id") Long id) {
         return this.adminService.getAdmin(id);
@@ -57,28 +57,6 @@ public class AdminController {
     // Save a new admin
     @PostMapping
     public AdminModel saveAdminModel(@RequestBody AdminModel admin) {
-
-        // Generate the salt
-        int saltLength = 16;
-        String salt = generateSalt(saltLength);
-
-        // Get password from AdminModel instance
-        String password = admin.getPassword();
-
-        // Combine salt and password
-        String saltedPassword = salt + password;
-
-        // Prepare encoder
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-        // Encode password
-        String hashedPassword = passwordEncoder.encode(saltedPassword);
-
-        // Set the salt and password hashed back to the AdminModel instance
-        admin.setSalt(salt);
-        admin.setPassword(hashedPassword);
-
-        // Save AdminModel instance
         return this.adminService.saveAdminModel(admin);
     }
 

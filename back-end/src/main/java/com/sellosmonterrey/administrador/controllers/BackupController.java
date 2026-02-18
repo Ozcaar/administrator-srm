@@ -50,8 +50,11 @@ public class BackupController {
     @Autowired
     private AuthService authService;
 
+    // String backupDirPath = BackupUtils.getBackupDirPath();
+    String backupDirPath = "./backups";
     String fileName = "backup_" + BackupUtils.getCurrentDateString() + ".csv";
-    String filePath = "F:\\sellos\\Sistemas\\backups" + fileName;
+    String filePath = backupDirPath + "/" + fileName;
+    String currentDateString = BackupUtils.getCurrentDateString();
 
     @GetMapping
     public ResponseEntity<String> createBackup(@RequestParam("username") String username,
@@ -67,14 +70,10 @@ public class BackupController {
         List<MailModel> mails = (List<MailModel>) mailRepository.findAll();
         List<ServiceModel> services = (List<ServiceModel>) serviceRepository.findAll();
 
-        String backupDirPath = BackupUtils.getBackupDirPath();
         File backupDir = new File(backupDirPath);
         if (!backupDir.exists()) {
             backupDir.mkdirs();
         }
-
-        // String currentDateString = BackupUtils.getCurrentDateString();
-        // String filePath = backupDirPath + "/" + currentDateString + ".csv";
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
 
@@ -95,13 +94,14 @@ public class BackupController {
             // Write header users
             writer.write("USUARIOS");
             writer.newLine();
-            writer.write("id,user,password,active,name,id_computer,comment");
+            writer.write("id,app_user,password,active,name,id_computer,comment");
             writer.newLine();
 
             // Write users
-            for (UserModel user : users) {
-                writer.write(user.getId() + "," + user.getUser() + "," + user.getPassword() + "," + user.getActive()
-                        + "," + user.getName() + "," + user.getId_computer() + "," + user.getComment());
+            for (UserModel app_user : users) {
+                writer.write(app_user.getId() + "," + app_user.getUser() + "," + app_user.getPassword() + ","
+                        + app_user.getActive()
+                        + "," + app_user.getName() + "," + app_user.getId_computer() + "," + app_user.getComment());
                 writer.newLine();
             }
             writer.newLine();
@@ -124,7 +124,7 @@ public class BackupController {
             // Write header mails
             writer.write("MAILS");
             writer.newLine();
-            writer.write("id,service,user,mail,password,recovery_mail");
+            writer.write("id,service,app_user,mail,password,recovery_mail");
             writer.newLine();
 
             // Write mails
@@ -138,7 +138,7 @@ public class BackupController {
             // Write header services
             writer.write("SERVICES");
             writer.newLine();
-            writer.write("id,servie,user,password,access_link");
+            writer.write("id,servie,app_user,password,access_link");
             writer.newLine();
 
             // Write services

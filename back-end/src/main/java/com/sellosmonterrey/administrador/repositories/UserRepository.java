@@ -9,5 +9,5 @@ import com.sellosmonterrey.administrador.models.UserModel;
 
 @Repository
 public interface UserRepository extends CrudRepository<UserModel, Long> {
-    public abstract ArrayList<UserModel> findById(Integer user);
+    public abstract ArrayList<UserModel> findById(Integer app_user);
 }

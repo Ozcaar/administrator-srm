@@ -43,7 +43,7 @@ public class UserController {
         }
     }
 
-    // Get an user by id
+    // Get an app_user by id
     @GetMapping(path = "/{id}")
     public ResponseEntity<Optional<UserModel>> getUser(@PathVariable("id") Long id,
             @RequestParam("username") String username,
@@ -58,7 +58,7 @@ public class UserController {
         }
     }
 
-    // Get an user by another param
+    // Get an app_user by another param
     // @GetMapping("/query")
     // public ArrayList<UserModel>
     // obtenerUsiarioPorDepartamento(@RequestParam("departamento") Integer
@@ -68,7 +68,7 @@ public class UserController {
 
     // POST
 
-    // Save a new user
+    // Save a new app_user
     @PostMapping
     public ResponseEntity<UserModel> saveUserModel(@RequestBody UserModel empleado,
             @RequestParam("username") String username,
@@ -100,7 +100,7 @@ public class UserController {
 
     // DELETE
 
-    // Delete an user by id
+    // Delete an app_user by id
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable("id") Long id, @RequestParam("username") String username,
             @RequestParam("token") String token) {

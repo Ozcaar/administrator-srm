@@ -3,7 +3,7 @@ package com.sellosmonterrey.administrador.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "app_user")
 public class UserModel {
 
     @Id
@@ -12,7 +12,7 @@ public class UserModel {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String user;
+    private String app_user;
 
     @Column(nullable = false)
     private String password;
@@ -34,11 +34,11 @@ public class UserModel {
     }
 
     public String getUser() {
-        return user;
+        return app_user;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setUser(String app_user) {
+        this.app_user = app_user;
     }
 
     public String getComment() {
