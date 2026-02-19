@@ -74,6 +74,7 @@ export default {
                 } else {
                     // Failed login
                     document.querySelector('.wrong-data').classList.remove('hidden-wrong-data');
+                    this.$refs.spinner.style.display = 'none';
                 }
 
 
